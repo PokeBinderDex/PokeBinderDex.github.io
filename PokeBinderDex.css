@@ -365,12 +365,15 @@ footer {
     padding-bottom: 20px;
 }
 
-.enhancement-item {
-    flex: 0 0 300px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    overflow: hidden;
-    background: white;
+.enhancement-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    border-color: var(--primary-color);
+}
+
+.enhancement-preview img {
+    width: 100%;
+    height: auto;
 }
 
 .enhancement-preview img {
