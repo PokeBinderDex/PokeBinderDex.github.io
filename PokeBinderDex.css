@@ -354,5 +354,84 @@ footer {
         height: 280px;
     }
 }
+.enhancement-container {
+    overflow-x: auto;
+    padding: 20px 0;
+}
+
+.enhancement-scroller {
+    display: flex;
+    gap: 20px;
+    padding-bottom: 20px;
+}
+
+.enhancement-item {
+    flex: 0 0 300px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+}
+
+.enhancement-preview img {
+    width: 100%;
+    height: auto;
+}
+
+.enhancement-details {
+    padding: 15px;
+}
+
+.new{
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 15px;
+    color: rgb(255, 89, 0);
+    
+    /* Pour donner un effet "exposant" */
+    vertical-align: super;
+    font-size: 2rem;
+
+    /* Rotation du texte */
+    display: inline-block; /* nécessaire pour rotate */
+    transform: rotate(-10deg);
+     /* Bordure noire */
+     text-shadow: 
+     -1px -1px 0 #000,  
+      1px -1px 0 #000,
+     -1px  1px 0 #000,
+      1px  1px 0 #000;
+}
+
+.announcement-banner {
+    width: 100%;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(90deg, #ff5e00, #ffb347, #ff5e00);
+    background-size: 200% 200%;
+    animation: shimmer 4s linear infinite;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    position: fixed; /* toujours visible */
+    top: 0;
+    left: 0;
+  }
+  
+  @keyframes shimmer {
+    0% {
+      background-position: 0% 50%;
+    }
+    100% {
+      background-position: 100% 50%;
+    }
+  }
+  
+  body {
+    padding-top: 50px; /* pour ne pas cacher le contenu sous le bandeau */
+  }
+
 
 
