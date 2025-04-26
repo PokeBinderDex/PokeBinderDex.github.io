@@ -504,6 +504,36 @@ footer {
     }
   }
 
+.bandeau {
+    overflow: hidden;
+    width: 100%;
+    height: 300px; /* Ajuste selon ton besoin (ex : hauteur d'une A4 en petit) */
+    background: white;
+    position: relative;
+}
+
+.bandeau-content {
+    display: flex;
+    width: max-content;
+    animation: defilement 30s linear infinite;
+}
+
+.bandeau-content img {
+    height: 100%; /* Toutes les images ont la même hauteur */
+    width: auto;  /* Respecte les proportions */
+    margin-right: 20px; /* Espacement entre les images, ajuste si besoin */
+}
+
+@keyframes defilement {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+
  
   
   
