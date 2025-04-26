@@ -507,7 +507,7 @@ footer {
 .bandeau {
     overflow: hidden;
     width: 100%;
-    height: 300px; /* Ajuste selon ton besoin (ex : hauteur d'une A4 en petit) */
+    height: 100px; /* Ajuste selon ton besoin (ex : hauteur d'une A4 en petit) */
     background: white;
     position: relative;
 }
