@@ -516,7 +516,7 @@ footer {
     display: flex;
     align-items: center; /* Centrer les images verticalement */
     width: max-content;
-    animation: defilement 30s linear infinite;
+    animation: defilement 8s linear infinite;
 }
 
 .bandeau-content img {
