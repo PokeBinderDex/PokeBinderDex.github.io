@@ -163,7 +163,7 @@ header p {
 }
 
 .package-header {
-    background: linear-gradient(135deg, var(--primary-color), var(--dark-accent));
+    background:  var(--dark-accent));
     color: white;
     padding: 15px;
     text-align: center;
