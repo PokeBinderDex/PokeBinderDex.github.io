@@ -234,7 +234,8 @@ header p {
 }
 
 .buy-button:hover {
-    background: radial-gradient(ellipse 60% 120% at center, #ff485a 0%, #ff485a 25%, #4072bd 89%, #4072bd 100%);
+    background: radial-gradient(ellipse 60% 120% at center, #ff485a 0%, #ff485a 25%, 
+                                    background: radial-gradient(ellipse 60% 120% at center, #ff485a 0%, #ff485a 25%, #75acff 89%, #75acff 100%);
 }
 
 .product-grid {
