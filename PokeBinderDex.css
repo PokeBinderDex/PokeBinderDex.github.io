@@ -529,6 +529,61 @@ footer {
 }
 
 
+/* CSS pour les logos dans les cartes de collection */
+
+/* Style de base pour tous les logos de collection */
+.package-card .collection-logo {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    height: 60px;
+    width: auto;
+    z-index: 1;
+}
+
+/* Effet d'empilement pour les collections complètes */
+.package-card.full-collection {
+    position: relative;
+    overflow: visible; /* Pour permettre aux logos empilés de déborder */
+}
+
+/* Premier logo dans la pile (arrière) */
+.package-card.full-collection .collection-logo:nth-of-type(1) {
+    transform: rotate(-5deg) translateX(10px);
+    z-index: 1;
+    opacity: 0.8;
+}
+
+/* Deuxième logo dans la pile (milieu) */
+.package-card.full-collection .collection-logo:nth-of-type(2) {
+    transform: rotate(0deg) translateX(5px);
+    z-index: 2;
+    opacity: 0.9;
+}
+
+/* Troisième logo dans la pile (devant) */
+.package-card.full-collection .collection-logo:nth-of-type(3) {
+    transform: rotate(5deg) translateX(0);
+    z-index: 3;
+    opacity: 1;
+}
+
+/* Ajustement pour que le contenu ne chevauche pas les logos */
+.package-card .package-content {
+    position: relative;
+    z-index: 0;
+}
+
+/* Pour l'ultimate collection, logo unique mais plus grand */
+.package-card.ultimate-card .collection-logo {
+    height: 80px;
+}
+
+/* Ajustement pour assurer que les package-cards sont en position relative */
+.package-card {
+    position: relative;
+}
+
 
  
   
