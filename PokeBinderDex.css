@@ -88,7 +88,7 @@ body {
 }
 
 header {
-    background: radial-gradient(circle 100px at center, var(--primary-color), var(--dark-accent));
+    background: radial-gradient(circle 700px at center, var(--primary-color), var(--dark-accent));
     color: white;
     padding: 30px 0;
     text-align: center;
