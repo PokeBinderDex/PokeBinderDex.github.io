@@ -515,9 +515,8 @@ footer {
 .bandeau-content {
     display: flex;
     align-items: center;
-    width: max-content;
-    animation: defilement 30s linear infinite; /* Animation plus lente pour plus de fluidité */
-    position: relative; /* Pour assurer une bonne position */
+    height: 100%;
+    will-change: transform;
 }
 
 .bandeau-content img {
@@ -525,16 +524,7 @@ footer {
     width: auto;
     margin-right: 20px;
     object-fit: contain;
-}
-
-@keyframes defilement {
-    0% {
-        transform: translateX(0);
-    }
-    100% {
-        /* Translation exactement de la longueur du premier groupe d'images */
-        transform: translateX(calc(-100% / 2));
-    }
+    flex-shrink: 0;
 }
 
 
