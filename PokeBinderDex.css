@@ -163,7 +163,7 @@ header p {
 }
 
 .package-header {
-    background:   background: radial-gradient(ellipse 60% 120% at center, var(--primary-color) 0%,     var(--primary-color) 25%,     var(--dark-accent) 89%,     var(--dark-accent) 100%);
+    background: radial-gradient(ellipse 60% 120% at center, var(--primary-color) 0%,     var(--primary-color) 25%,     var(--dark-accent) 89%,     var(--dark-accent) 100%);
     color: white;
     padding: 15px;
     text-align: center;
