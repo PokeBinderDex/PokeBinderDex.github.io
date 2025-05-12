@@ -544,7 +544,7 @@ footer {
 /* Effet d'empilement pour les collections complètes */
 .package-card.full-collection {
     position: relative;
-    overflow: visible; /* Pour permettre aux logos empilés de déborder */
+    /* Pour permettre aux logos empilés de déborder */
 }
 
 /* Premier logo dans la pile (arrière) */
