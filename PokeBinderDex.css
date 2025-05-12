@@ -1,9 +1,9 @@
 :root {
     --primary-color: #fc5160;
-    --secondary-color: #ffffff;
+    --secondary-color: #f1faee;
     --light-color: #ffffff;
-    --accent-color: #ffffff;
-    --dark-accent: #ffffff;
+    --accent-color: #9ed1fe;
+    --dark-accent: #9bc4ff;
     --text-color: #333333;
     --border-radius: 12px;
     --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -88,7 +88,7 @@ body {
 }
 
 header {
-    background: radial-gradient(circle, var(--primary-color), var(--dark-accent));
+    background: radial-gradient(circle 100px at center, var(--primary-color), var(--dark-accent));
     color: white;
     padding: 30px 0;
     text-align: center;
