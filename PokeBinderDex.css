@@ -299,7 +299,7 @@ header p {
 .ultimate-card {
     grid-column: 1 / -1;
     background: linear-gradient(to right, rgba(230, 57, 70, 0.05), rgba(255, 255, 255, 1));
-    border: 3px solid #ffe7a7;
+    border: 3px solid var(--primary-color);
 }
 
 .ultimate-header {
