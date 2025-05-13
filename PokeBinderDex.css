@@ -537,25 +537,22 @@ footer {
 
 /* Style de base pour tous les logos de collection */
 .package-card .collection-logo {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    height: 60px;
+    position: relative;
+    top: 66px;
+    right: -20px;
+    height: 45px;
     width: auto;
     z-index: 1;
 }
 
-/* Effet d'empilement pour les collections complètes */
-.package-card.full-collection {
-    position: relative;
-    overflow: visible; /* Pour permettre aux logos empilés de déborder */
-}
+
 
 /* Premier logo dans la pile (arrière) */
 .package-card.full-collection .collection-logo:nth-of-type(1) {
     transform: rotate(-5deg) translateX(10px);
     z-index: 1;
     opacity: 0.8;
+    top: 40px;
 }
 
 /* Deuxième logo dans la pile (milieu) */
@@ -563,6 +560,8 @@ footer {
     transform: rotate(0deg) translateX(5px);
     z-index: 2;
     opacity: 0.9;
+   top: 40px;
+    left: -15px;
 }
 
 /* Troisième logo dans la pile (devant) */
@@ -570,13 +569,11 @@ footer {
     transform: rotate(5deg) translateX(0);
     z-index: 3;
     opacity: 1;
+    top: 40px;
+    left: -50px;
 }
 
-/* Ajustement pour que le contenu ne chevauche pas les logos */
-.package-card .package-content {
-    position: relative;
-    z-index: 0;
-}
+
 
 /* Pour l'ultimate collection, logo unique mais plus grand */
 .package-card.ultimate-card .collection-logo {
