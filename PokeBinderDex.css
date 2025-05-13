@@ -577,7 +577,8 @@ footer {
 
 /* Pour l'ultimate collection, logo unique mais plus grand */
 .package-card.ultimate-card .collection-logo {
-    height: 80px;
+    height: 70px;
+    top: 40px;
 }
 
 /* Ajustement pour assurer que les package-cards sont en position relative */
