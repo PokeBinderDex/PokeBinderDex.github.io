@@ -575,7 +575,7 @@ footer {
 }
 
 /* Pour l'ultimate collection, logo unique mais plus grand */
-.package-header.ultimate-card .collection-logo {
+.package-header.ultimate-header .collection-logo {
     height: 80px;
 }
 
