@@ -242,7 +242,7 @@ header p {
 .gen-button {
     width: auto; /* ou 30%, 150px, selon ton design */
     display: inline-block; /* pour qu'ils soient côte à côte si nécessaire */
-    margin-right: 12px; /* espacement entre les boutons */
+    margin-right: 10px; /* espacement entre les boutons */
 }
 
 
