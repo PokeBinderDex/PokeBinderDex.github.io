@@ -25,6 +25,8 @@
     <meta name="google-site-verification" content="JzIx0FrAud7cbPRXuWARlf128aqmyCrJVSlKyW7eiho" />
 
     <script src="bandeau_script.js" defer></script>
+    <script src="search_database.js"></script>
+    <script src="search_functionality.js" defer></script>
 </head>
 <body>
   
@@ -41,7 +43,24 @@
         <p>Premium Pokémon PDF Collections for Collectors and Enthusiasts</p>
     </header>
 
-    <div class="bandeau">
+
+<!-- Barre de navigation sticky - À ajouter après le header -->
+    <nav class="sticky-nav" id="stickyNav">
+        <div class="sticky-nav-container">
+            <div class="sticky-nav-buttons">
+                <a href="#overview" class="sticky-nav-btn overview">Overview</a>
+                <div class="nav-separator"></div>
+                <a href="#solodex" class="sticky-nav-btn">SoloDex</a>
+                <a href="#soloset" class="sticky-nav-btn">SoloSet</a>
+                <a href="#solomasterset" class="sticky-nav-btn">SoloMasterSet</a>
+                <a href="#FavoriMon" class="sticky-nav-btn">FavoriMon</a>
+                <!-- <a href="#FavoriIllustrator" class="sticky-nav-btn">FavoriIllustrator</a> -->
+            </div>
+        </div>
+    </nav>
+
+
+<div class="bandeau">
     <div class="bandeau-content">
         <!-- Mets ici tes 13 images -->
         <img src="assets/black_dex.png" alt="Image 1" loading="lazy">
@@ -81,7 +100,7 @@
 <!-- Code HTML pour la section "Our Collections" avec logos -->
 <h2 class="section-title">Our Collections</h2>
         
-<div class="collection-overview">
+<div class="collection-overview" id="overview">
     <div class="package-card">
         <div class="package-header">SoloDex Collections</div>
         <img src="assets/solodex_logo.png" alt="SoloDex Logo" class="collection-logo">
@@ -111,6 +130,28 @@
             <a href="#solomasterset" class="buy-button">View Options</a>
         </div>
     </div>
+
+
+    <div class="package-card">
+        <div class="package-header">FavoriMon Collections</div>
+        <img src="assets/favorimon_logo.png" alt="FavoriMon Logo" class="collection-logo">
+        <div class="package-price">$1.10 </div>
+        <div class="package-content">
+            <p class="package-description">All pokémon cards of your favorite pokémon (and more of its gen).</p>
+            <a href="#FavoriMon" class="buy-button">View Options</a>
+        </div>
+    </div>
+
+
+  <!--  <div class="package-card">
+        <div class="package-header">FavoriIllustrator Collections</div>
+        <img src="assets/FavoriIllustrator_logo.png" alt="FavoriIllustrator Logo" class="collection-logo">
+        <div class="package-price">$1.10 </div>
+        <div class="package-content">
+            <p class="package-description">All pokémon cards of your favorite pokemon illustrator/p>
+            <a href="#FavoriMon" class="buy-button">View Options</a>
+        </div>
+    </div> -->
 
     <div class="package-card full-collection">
         <div class="package-header">FullDex Complete Pack</div>
@@ -274,6 +315,192 @@
                 </div>
             </div>
         </section>
+
+        <section id="FavoriMon">
+            <h2 class="section-title">FavoriMon Collections</h2>
+            <div class="price-banner">FavoriMon Collections: $1.10 each</div>
+            
+            <div class="search-container">
+                <div class="search-bar">
+                    <div class="search-input-container">
+                        <input type="text" class="search-input" placeholder="Check if your favorite Pokémon is here..." autocomplete="off">
+                        <div class="search-suggestions"></div>
+                    </div>
+                    
+                    <div class="separator"></div>
+                    
+                    <div class="fulllist-container">
+                        <button class="fulllist-btn">
+                            FullList <span class="dropdown-arrow">▼</span>
+                        </button>
+                        <div class="fulllist-dropdown">
+                            <div class="fulllist-content">
+                                <!-- Contenu généré par JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="scroll-container">
+                <div class="scroll-wrapper">
+                    <!-- Gen 1 -->
+                    <div class="product-card">
+                        <div class="product-image"><img src="assets/gen1.png" alt="Gen 1"></div>
+                        <div class="product-details">
+                            <h3 class="product-title">Gen 1</h3>
+                            <p class="product-description">Every cards of your favorite pokémon from the Kanto region and people's favorite .</p>
+                            <h3 class="product-title">Buy on PayHip :</h3>
+                            <a href="https://payhip.com/b/zsbgI" class="buy-button gen-button">A-E</a>
+                            <a href="https://payhip.com/b/ZS95g" class="buy-button gen-button">G-P</a>
+                            <a href="https://payhip.com/b/cpPXh" class="buy-button gen-button">R-V</a>
+                        </div>
+                    </div>
+
+                    <!-- Gen 2 -->
+                    <div class="product-card">
+                        <div class="product-image"><img src="assets/gen2.png" alt="Gen 2"></div>
+                        <div class="product-details">
+                            <h3 class="product-title">Gen 2</h3>
+                            <p class="product-description">Every cards of your favorite pokémon from the Johto region and people's favorite .</p>
+                            <h3 class="product-title">Buy on PayHip :</h3>
+                            <a href="https://payhip.com/b/dLE1s" class="buy-button gen-button">A-H</a>
+                            <a href="https://payhip.com/b/yegsP" class="buy-button gen-button">J-Q</a>
+                            <a href="https://payhip.com/b/F3PvH" class="buy-button gen-button">S-W</a>
+                        </div>
+                    </div>
+
+                    <!-- Gen 3 -->
+                    <div class="product-card">
+                        <div class="product-image"><img src="assets/gen3.png" alt="Gen 3"></div>
+                        <div class="product-details">
+                            <h3 class="product-title">Gen 3</h3>
+                            <p class="product-description">Every cards of your favorite pokémon from the Hoenn region and people's favorite .</p>
+                            <h3 class="product-title">Buy on PayHip :</h3>
+                            <a href="https://payhip.com/b/d4KIW" class="buy-button gen-button">A-G</a>
+                            <a href="https://payhip.com/b/4Hz1u" class="buy-button gen-button">J-M</a>
+                            <a href="https://payhip.com/b/DATzN" class="buy-button gen-button">R-T</a>
+                        </div>
+                    </div>
+
+                    <!-- Gen 4 -->
+                    <div class="product-card">
+                        <div class="product-image"><img src="assets/gen4.png" alt="Gen 4"></div>
+                        <div class="product-details">
+                            <h3 class="product-title">Gen 4</h3>
+                            <p class="product-description">Every cards of your favorite pokémon from the Sinnoh region and people's favorite .</p>
+                            <h3 class="product-title">Buy on PayHip :</h3>
+                            <a href="https://payhip.com/b/VHnCd" class="buy-button gen-button">A-G</a>
+                            <a href="https://payhip.com/b/8Gka3" class="buy-button gen-button">I-P</a>
+                            <a href="https://payhip.com/b/mPtr8" class="buy-button gen-button">R-W</a>
+                        </div>
+                    </div>
+
+                    <!-- Gen 5 -->
+                    <div class="product-card">
+                        <div class="product-image"><img src="assets/gen5.png" alt="Gen 5"></div>
+                        <div class="product-details">
+                            <h3 class="product-title">Gen 5</h3>
+                            <p class="product-description">Every cards of your favorite pokémon from the Unova region and people's favorite .</p>
+                            <h3 class="product-title">Buy on PayHip :</h3>
+                            <a href="https://payhip.com/b/alOX5" class="buy-button gen-button">B-J</a>
+                            <a href="https://payhip.com/b/MHQdU" class="buy-button gen-button">K-R</a>
+                            <a href="https://payhip.com/b/hPRTI" class="buy-button gen-button">S-Z</a>
+                        </div>
+                    </div>
+
+                    <!-- Gen 6 -->
+                    <div class="product-card">
+                        <div class="product-image"><img src="assets/gen6.png" alt="Gen 6"></div>
+                        <div class="product-details">
+                            <h3 class="product-title">Gen 6</h3>
+                            <p class="product-description">Every cards of your favorite pokémon from the Kalos region and people's favorite .</p>
+                            <h3 class="product-title">Buy on PayHip :</h3>
+                            <a href="https://payhip.com/b/hpvKo" class="buy-button gen-button">A-G</a>
+                            <a href="https://payhip.com/b/ZVDPk" class="buy-button gen-button">H-P</a>
+                            <a href="https://payhip.com/b/Z6mDS" class="buy-button gen-button">S-Z</a>
+                        </div>
+                    </div>
+
+                    <!-- Gen 7 -->
+                    <div class="product-card">
+                        <div class="product-image"><img src="assets/gen7.png" alt="Gen 7"></div>
+                        <div class="product-details">
+                            <h3 class="product-title">Gen 7</h3>
+                            <p class="product-description">Every cards of your favorite pokémon from the Alola region and people's favorite .</p>
+                            <h3 class="product-title">Buy on PayHip :</h3>
+                            <a href="https://payhip.com/b/tJzQx" class="buy-button gen-button">B-L</a>
+                            <a href="https://payhip.com/b/ftEkQ" class="buy-button gen-button">M-R</a>
+                            <a href="https://payhip.com/b/aQsDL" class="buy-button gen-button">S-V</a>
+                        </div>
+                    </div>
+
+                    <!-- Gen 8 -->
+                    <div class="product-card">
+                        <div class="product-image"><img src="assets/gen8.png" alt="Gen 8"></div>
+                        <div class="product-details">
+                            <h3 class="product-title">Gen 8</h3>
+                            <p class="product-description">Every cards of your favorite pokémon from the Galar region and people's favorite .</p>
+                            <h3 class="product-title">Buy on PayHip :</h3>
+                            <a href="https://payhip.com/b/tYbox" class="buy-button gen-button">A-F</a>
+                            <a href="https://payhip.com/b/LzdXK" class="buy-button gen-button">G-O</a>
+                            <a href="https://payhip.com/b/Bx6A9" class="buy-button gen-button">R-Z</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+
+   <!--  <section id="FavoriIllustrator">
+            <h2 class="section-title">FavoriIllustrator Collections</h2>
+            <div class="price-banner">FavoriIllustrator Collections: $1.10 each</div>
+            
+            <div class="scroll-container">
+                <div class="scroll-wrapper">
+                    <div class="product-card">
+                        <div class="product-image"><img src="assets/ill1.png" alt="Gen 1"></div>
+                        <div class="product-details">
+                            <h3 class="product-title">Ill1</h3>
+                            <p class="product-description">Every cards of your favorite pokémon illustrator.</p>
+                            <a href="#" class="buy-button">Buy on PayHip</a>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image"><img src="assets/ill2.png" alt="Gen 2"></div>
+                        <div class="product-details">
+                            <h3 class="product-title">Ill2</h3>
+                            <p class="product-description">Every cards of your favorite pokémon illustrator</p>
+                            <a href="#" class="buy-button">Buy on PayHip</a>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image"><img src="assets/ill3.png" alt="Gen 3"></div>
+                        <div class="product-details">
+                            <h3 class="product-title">Ill3</h3>
+                            <p class="product-description">Every cards of your favorite pokémon illustrator</p>
+                            <a href="#" class="buy-button">Buy on PayHip</a>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <div class="product-image"><img src="assets/ill4.png" alt="Gen 4"></div>
+                        <div class="product-details">
+                            <h3 class="product-title">Ill4</h3>
+                            <p class="product-description">Every cards of your favorite pokémon illustrator</p>
+                            <a href="#" class="buy-button">Buy on PayHip</a>
+                        </div>
+                    </div>
+                   
+                    
+               
+                </div>
+            </div>
+        </section> -->
 
      
 
