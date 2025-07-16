@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokémon Card Scanner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 50px 20px;
+            text-align: center;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            background: #e8f0ff;
+            border-color: #5a6fd8;
+        }
+
+        .upload-area.dragover {
+            background: #e8f0ff;
+            border-color: #5a6fd8;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .upload-text {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .preview-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+        }
+
+        .result-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .pokemon-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .confidence {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .loading::after {
+            content: "";
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #667eea;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #ffe6e6;
+            color: #d63384;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 5px solid #d63384;
+            margin-top: 20px;
+        }
+
+        .settings {
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .setting-item {
+            margin-bottom: 15px;
+        }
+
+        .setting-item label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .setting-item input, .setting-item select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .toggle-settings {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+
+        .settings.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <a href="index.html" style="color: #667eea; text-decoration: none; font-size: 1.1em;">
+                ← Retour à l'accueil
+            </a>
+        </div>
+        
+        <h1>🎴 Pokémon Card Scanner</h1>
+        
+        <button class="toggle-settings" onclick="toggleSettings()">⚙️ Paramètres avancés</button>
+        
+        <div class="settings hidden" id="settings">
+            <div class="setting-item">
+                <label for="language">Langue OCR :</label>
+                <select id="language">
+                    <option value="en">Anglais</option>
+                    <option value="fr">Français</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <label for="similarity">Seuil de similitude (%) :</label>
+                <input type="number" id="similarity" value="72" min="50" max="100">
+            </div>
+            <div class="setting-item">
+                <label for="tolerance">Tolérance de taille (%) :</label>
+                <input type="number" id="tolerance" value="30" min="10" max="100">
+            </div>
+        </div>
+
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📷</div>
+            <div class="upload-text">Glissez-déposez votre image de carte Pokémon ici</div>
+            <div class="upload-text">ou</div>
+            <button class="btn" onclick="document.getElementById('fileInput').click()">
+                Choisir un fichier
+            </button>
+            <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
+        </div>
+
+        <div class="preview-container" id="previewContainer" style="display: none;">
+            <img id="previewImage" class="preview-image" alt="Aperçu">
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        let currentImage = null;
+
+        function toggleSettings() {
+            const settings = document.getElementById('settings');
+            settings.classList.toggle('hidden');
+        }
+
+        // Gestion du drag & drop
+        const uploadArea = document.getElementById('uploadArea');
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showError('Veuillez sélectionner un fichier image valide.');
+                return;
+            }
+
+            currentImage = file;
+            
+            // Afficher l'aperçu
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('previewImage');
+                const container = document.getElementById('previewContainer');
+                preview.src = e.target.result;
+                container.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+
+            // Traiter l'image
+            processImage(file);
+        }
+
+        async function processImage(file) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="loading">Analyse de l\'image en cours...</div>';
+
+            try {
+                // Appel à votre vraie API
+                const response = await callPokemonAPI(file);
+                
+                if (response.success) {
+                    // Convertir le format API vers le format attendu par displayResults
+                    const results = Array.isArray(response.pokemon) 
+                        ? response.pokemon 
+                        : [response.pokemon];
+                    
+                    displayResults(results);
+                } else {
+                    showError(response.message || 'Aucun Pokémon détecté');
+                }
+                
+            } catch (error) {
+                showError('Erreur lors du traitement de l\'image : ' + error.message);
+            }
+        }
+
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('results');
+            
+            if (!results || results.length === 0) {
+                resultsDiv.innerHTML = '<div class="error">Aucun Pokémon détecté dans cette image.</div>';
+                return;
+            }
+
+            let html = '<div class="results"><h3>🎯 Pokémon détectés :</h3>';
+            
+            results.forEach((result, index) => {
+                html += `
+                    <div class="result-item">
+                        <div class="pokemon-name">${result.name}</div>
+                        <div class="confidence">
+                            Similitude: ${result.similarity}% | 
+                            Confiance OCR: ${(result.confidence * 100).toFixed(1)}%
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            resultsDiv.innerHTML = html;
+        }
+
+        function showError(message) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `<div class="error">${message}</div>`;
+        }
+
+        // Configuration de l'API (remplacez par votre URL Render)
+        const API_BASE_URL = 'https://votre-app-name.onrender.com';
+        
+        // Fonction pour appeler votre API backend
+        async function callPokemonAPI(imageFile) {
+            const formData = new FormData();
+            formData.append('image', imageFile);
+            formData.append('lang', document.getElementById('language').value);
+            formData.append('similarity_threshold', document.getElementById('similarity').value);
+            formData.append('size_tolerance', document.getElementById('tolerance').value / 100);
+
+            const apiUrl = `${API_BASE_URL}/api/detect-pokemon`;
+            
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error('Erreur API: ' + response.statusText);
+            }
+
+            return await response.json();
+        }
+    </script>
+</body>
+</html>
