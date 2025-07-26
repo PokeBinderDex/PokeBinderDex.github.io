@@ -251,7 +251,7 @@
     <div class="container">
         <div class="header">
             <h1>🎴 Scanner Pokémon</h1>
-            <p>Identifiez automatiquement</p>
+            <p>Identifiez automatiquement vos cartes</p>
         </div>
 
         <div class="scanner-section">
@@ -323,10 +323,10 @@
         </div>
     </div>
 
-    <!-- Client Gradio JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js"></script>
-    
-    <script>
+    <!-- Client Gradio JavaScript - Version corrigée -->
+    <script type="module">
+        import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.js";
+        
         // Variables globales
         let gradioClient = null;
         
@@ -350,7 +350,7 @@
         async function initGradioClient() {
             if (!gradioClient) {
                 try {
-                    gradioClient = await window.gradio.Client.connect("leonheart2B/pokemon-card-scanner");
+                    gradioClient = await Client.connect("leonheart2B/pokemon-card-scanner");
                     console.log("✅ Client Gradio connecté");
                 } catch (error) {
                     console.error("❌ Erreur connexion Gradio:", error);
@@ -575,6 +575,10 @@
         function hideResults() {
             results.classList.remove('show');
         }
+
+        // Exposer les fonctions nécessaires globalement
+        window.handleFileSelect = handleFileSelect;
+        window.scanImage = scanImage;
     </script>
 </body>
 </html>
