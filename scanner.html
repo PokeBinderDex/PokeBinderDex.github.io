@@ -870,4 +870,395 @@
             pdfSection.classList.add('show');
 
             if (newPokemon.length > 0) {
-                console.log(`🎉 Nouveaux Pokémon ajoutés:
+                console.log(`🎉 Nouveaux Pokémon ajoutés: ${newPokemon.join(', ')}`);
+            }
+        }
+        
+        // Créer une carte pour un Pokémon
+        function createPokemonCard(pokemon, detectionLang) {
+            const card = document.createElement('div');
+            card.className = 'result-card';
+            
+            const flag = LANGUAGE_FLAGS[pokemon.language || detectionLang] || '🏳️';
+            const langName = LANGUAGE_NAMES[pokemon.language || detectionLang] || (pokemon.language || detectionLang);
+            
+            const isNew = !pokemonCollection.has(pokemon.name.toLowerCase());
+            const newBadge = isNew ? '<span style="background: #10b981; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; margin-left: 10px;">🆕 NOUVEAU</span>' : '';
+            
+            card.innerHTML = `
+                <div class="pokemon-name">${pokemon.name} ${newBadge}</div>
+                <div class="pokemon-language">${flag} ${langName}</div>
+                <div>
+                    <strong>Similitude:</strong> ${pokemon.similarity.toFixed(1)}%
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: ${pokemon.similarity}%"></div>
+                    </div>
+                </div>
+                <div>
+                    <strong>Confiance OCR:</strong> ${pokemon.confidence.toFixed(1)}%
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: ${pokemon.confidence}%"></div>
+                    </div>
+                </div>
+            `;
+            
+            resultsList.appendChild(card);
+        }
+
+        // Ajouter un Pokémon à la collection
+        function addPokemonToCollection(pokemonName) {
+            const normalizedName = pokemonName.toLowerCase();
+            pokemonCollection.add(normalizedName);
+            
+            // Essayer de deviner le numéro Pokédex (simulation - dans un vrai cas, utiliser une API)
+            const pokemonNumber = guessPokemonNumber(pokemonName);
+            pokemonDetails[normalizedName] = {
+                name: pokemonName,
+                number: pokemonNumber,
+                generation: getGenerationFromNumber(pokemonNumber),
+                dateFound: new Date().toISOString()
+            };
+        }
+
+        // Fonction pour deviner le numéro Pokédex (simulation basique)
+        function guessPokemonNumber(name) {
+            // Base de données simplifiée des Pokémon populaires
+            const knownPokemon = {
+                'pikachu': 25, 'charizard': 6, 'blastoise': 9, 'venusaur': 3,
+                'mewtwo': 150, 'mew': 151, 'lugia': 249, 'ho-oh': 250,
+                'celebi': 251, 'rayquaza': 384, 'dialga': 483, 'palkia': 484,
+                'arceus': 493, 'reshiram': 643, 'zekrom': 644, 'kyurem': 646,
+                'xerneas': 716, 'yveltal': 717, 'zygarde': 718, 'necrozma': 800,
+                'zacian': 888, 'zamazenta': 889, 'eternatus': 890, 'koraidon': 1007,
+                'miraidon': 1008, 'bulbasaur': 1, 'ivysaur': 2, 'charmander': 4,
+                'charmeleon': 5, 'squirtle': 7, 'wartortle': 8, 'caterpie': 10,
+                'metapod': 11, 'butterfree': 12, 'weedle': 13, 'kakuna': 14,
+                'beedrill': 15, 'pidgey': 16, 'pidgeotto': 17, 'pidgeot': 18,
+                'rattata': 19, 'raticate': 20, 'spearow': 21, 'fearow': 22,
+                'ekans': 23, 'arbok': 24, 'raichu': 26, 'sandshrew': 27,
+                'sandslash': 28, 'nidoran': 29, 'nidorina': 30, 'nidoqueen': 31,
+                'clefairy': 35, 'clefable': 36, 'vulpix': 37, 'ninetales': 38,
+                'jigglypuff': 39, 'wigglytuff': 40, 'zubat': 41, 'golbat': 42,
+                'oddish': 43, 'gloom': 44, 'vileplume': 45, 'paras': 46,
+                'parasect': 47, 'venonat': 48, 'venomoth': 49, 'diglett': 50,
+                'dugtrio': 51, 'meowth': 52, 'persian': 53, 'psyduck': 54,
+                'golduck': 55, 'mankey': 56, 'primeape': 57, 'growlithe': 58,
+                'arcanine': 59, 'poliwag': 60, 'poliwhirl': 61, 'poliwrath': 62,
+                'abra': 63, 'kadabra': 64, 'alakazam': 65, 'machop': 66,
+                'machoke': 67, 'machamp': 68, 'bellsprout': 69, 'weepinbell': 70,
+                'victreebel': 71, 'tentacool': 72, 'tentacruel': 73, 'geodude': 74,
+                'graveler': 75, 'golem': 76, 'ponyta': 77, 'rapidash': 78,
+                'slowpoke': 79, 'slowbro': 80, 'magnemite': 81, 'magneton': 82,
+                'doduo': 84, 'dodrio': 85, 'seel': 86, 'dewgong': 87,
+                'grimer': 88, 'muk': 89, 'shellder': 90, 'cloyster': 91,
+                'gastly': 92, 'haunter': 93, 'gengar': 94, 'onix': 95,
+                'drowzee': 96, 'hypno': 97, 'krabby': 98, 'kingler': 99,
+                'voltorb': 100, 'electrode': 101, 'exeggcute': 102, 'exeggutor': 103,
+                'cubone': 104, 'marowak': 105, 'hitmonlee': 106, 'hitmonchan': 107,
+                'lickitung': 108, 'koffing': 109, 'weezing': 110, 'rhyhorn': 111,
+                'rhydon': 112, 'chansey': 113, 'tangela': 114, 'kangaskhan': 115,
+                'horsea': 116, 'seadra': 117, 'goldeen': 118, 'seaking': 119,
+                'staryu': 120, 'starmie': 121, 'mr. mime': 122, 'scyther': 123,
+                'jynx': 124, 'electabuzz': 125, 'magmar': 126, 'pinsir': 127,
+                'tauros': 128, 'magikarp': 129, 'gyarados': 130, 'lapras': 131,
+                'ditto': 132, 'eevee': 133, 'vaporeon': 134, 'jolteon': 135,
+                'flareon': 136, 'porygon': 137, 'omanyte': 138, 'omastar': 139,
+                'kabuto': 140, 'kabutops': 141, 'aerodactyl': 142, 'snorlax': 143,
+                'articuno': 144, 'zapdos': 145, 'moltres': 146, 'dratini': 147,
+                'dragonair': 148, 'dragonite': 149
+            };
+            
+            const normalized = name.toLowerCase();
+            return knownPokemon[normalized] || Math.floor(Math.random() * TOTAL_POKEMON) + 1;
+        }
+
+        // Déterminer la génération d'un Pokémon par son numéro
+        function getGenerationFromNumber(number) {
+            for (const [gen, range] of Object.entries(GENERATION_RANGES)) {
+                if (number >= range.start && number <= range.end) {
+                    return parseInt(gen);
+                }
+            }
+            return 1; // Par défaut
+        }
+
+        // Mettre à jour les statistiques
+        function updateStatistics() {
+            const totalFound = pokemonCollection.size;
+            const completionPercentage = ((totalFound / TOTAL_POKEMON) * 100).toFixed(1);
+            const uniqueCount = totalFound; // Même chose pour le moment
+
+            // Mettre à jour les statistiques principales
+            document.getElementById('totalFound').textContent = totalFound;
+            document.getElementById('completionPercentage').textContent = completionPercentage + '%';
+            document.getElementById('uniqueCount').textContent = uniqueCount;
+
+            // Mettre à jour les statistiques par génération
+            updateGenerationStats();
+        }
+
+        // Mettre à jour les statistiques par génération
+        function updateGenerationStats() {
+            const genGrid = document.getElementById('genGrid');
+            genGrid.innerHTML = '';
+
+            Object.entries(GENERATION_RANGES).forEach(([gen, range]) => {
+                const foundInGen = Array.from(pokemonCollection).filter(pokemon => {
+                    const details = pokemonDetails[pokemon];
+                    return details && details.generation === parseInt(gen);
+                }).length;
+
+                const totalInGen = range.end - range.start + 1;
+                const percentage = totalInGen > 0 ? (foundInGen / totalInGen) * 100 : 0;
+
+                const genCard = document.createElement('div');
+                genCard.className = 'gen-card';
+                genCard.innerHTML = `
+                    <div class="gen-title">Gen ${gen}</div>
+                    <div>${range.name}</div>
+                    <div class="gen-progress">
+                        <div class="gen-progress-fill" style="width: ${percentage}%"></div>
+                    </div>
+                    <div>${foundInGen}/${totalInGen}</div>
+                    <div style="font-size: 0.8em;">${percentage.toFixed(1)}%</div>
+                `;
+                genGrid.appendChild(genCard);
+            });
+        }
+
+        // Générer un PDF
+        async function generatePDF(type) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Configuration
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 20;
+            const lineHeight = 7;
+            let yPosition = margin + 10;
+
+            // Titre
+            doc.setFontSize(20);
+            doc.setFont(undefined, 'bold');
+            
+            let title = '';
+            switch(type) {
+                case 'found':
+                    title = `🎴 Pokémon Collection - Trouvés (${pokemonCollection.size})`;
+                    break;
+                case 'missing':
+                    title = `📋 Pokémon Collection - Manquants (${TOTAL_POKEMON - pokemonCollection.size})`;
+                    break;
+                case 'complete':
+                    title = `📚 Pokédex National Complet (${TOTAL_POKEMON})`;
+                    break;
+            }
+            
+            doc.text(title, margin, yPosition);
+            yPosition += 15;
+
+            // Informations générales
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'normal');
+            doc.text(`Généré le: ${new Date().toLocaleDateString('fr-FR')}`, margin, yPosition);
+            yPosition += 8;
+            doc.text(`Progression: ${pokemonCollection.size}/${TOTAL_POKEMON} (${((pokemonCollection.size/TOTAL_POKEMON)*100).toFixed(1)}%)`, margin, yPosition);
+            yPosition += 15;
+
+            // Contenu par génération
+            doc.setFontSize(14);
+            doc.setFont(undefined, 'bold');
+
+            for (const [gen, range] of Object.entries(GENERATION_RANGES)) {
+                // Vérifier si on a besoin d'une nouvelle page
+                if (yPosition > pageHeight - 60) {
+                    doc.addPage();
+                    yPosition = margin;
+                }
+
+                // Titre de génération
+                doc.setFontSize(14);
+                doc.setFont(undefined, 'bold');
+                doc.text(`Génération ${gen} - ${range.name} (#${range.start}-${range.end})`, margin, yPosition);
+                yPosition += 10;
+
+                // Pokémon de cette génération
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'normal');
+                
+                const pokemonInGen = [];
+                for (let i = range.start; i <= range.end; i++) {
+                    const found = Array.from(pokemonCollection).some(pokemon => {
+                        const details = pokemonDetails[pokemon];
+                        return details && details.number === i;
+                    });
+                    
+                    // Nom simulé (dans un vrai cas, utiliser une base de données)
+                    const pokemonName = getPokemonNameByNumber(i);
+                    
+                    switch(type) {
+                        case 'found':
+                            if (found) pokemonInGen.push(`#${i.toString().padStart(3, '0')} ${pokemonName}`);
+                            break;
+                        case 'missing':
+                            if (!found) pokemonInGen.push(`#${i.toString().padStart(3, '0')} ${pokemonName}`);
+                            break;
+                        case 'complete':
+                            pokemonInGen.push(`#${i.toString().padStart(3, '0')} ${pokemonName}${found ? ' ✓' : ''}`);
+                            break;
+                    }
+                }
+
+                // Afficher les Pokémon en colonnes
+                const itemsPerRow = 2;
+                const columnWidth = (pageWidth - 2 * margin) / itemsPerRow;
+                
+                pokemonInGen.forEach((pokemon, index) => {
+                    const col = index % itemsPerRow;
+                    const row = Math.floor(index / itemsPerRow);
+                    
+                    const x = margin + col * columnWidth;
+                    const y = yPosition + row * lineHeight;
+                    
+                    // Vérifier si on a besoin d'une nouvelle page
+                    if (y > pageHeight - 30) {
+                        doc.addPage();
+                        yPosition = margin;
+                        const newY = yPosition + (row - Math.floor(index / itemsPerRow)) * lineHeight;
+                        doc.text(pokemon, x, newY);
+                    } else {
+                        doc.text(pokemon, x, y);
+                    }
+                });
+
+                yPosition += Math.ceil(pokemonInGen.length / itemsPerRow) * lineHeight + 10;
+            }
+
+            // Sauvegarder le PDF
+            const filename = `pokemon-collection-${type}-${new Date().toISOString().split('T')[0]}.pdf`;
+            doc.save(filename);
+            
+            console.log(`📄 PDF généré: ${filename}`);
+        }
+
+        // Fonction pour obtenir le nom d'un Pokémon par son numéro (simulation)
+        function getPokemonNameByNumber(number) {
+            const pokemonNames = {
+                1: 'Bulbasaur', 2: 'Ivysaur', 3: 'Venusaur', 4: 'Charmander', 5: 'Charmeleon',
+                6: 'Charizard', 7: 'Squirtle', 8: 'Wartortle', 9: 'Blastoise', 10: 'Caterpie',
+                25: 'Pikachu', 150: 'Mewtwo', 151: 'Mew', 249: 'Lugia', 250: 'Ho-Oh'
+            };
+            
+            return pokemonNames[number] || `Pokémon #${number}`;
+        }
+
+        // Réinitialiser la collection
+        function resetCollection() {
+            if (confirm('Êtes-vous sûr de vouloir réinitialiser votre collection ?')) {
+                pokemonCollection.clear();
+                pokemonDetails = {};
+                saveCollection();
+                updateStatistics();
+                console.log('🔄 Collection réinitialisée');
+                
+                // Cacher les sections
+                statsSection.classList.remove('show');
+                pdfSection.classList.remove('show');
+                results.classList.remove('show');
+            }
+        }
+
+        // Exporter la collection en JSON
+        function exportJSON() {
+            const data = {
+                collection: Array.from(pokemonCollection),
+                details: pokemonDetails,
+                exportDate: new Date().toISOString(),
+                totalPokemon: pokemonCollection.size,
+                completionPercentage: ((pokemonCollection.size / TOTAL_POKEMON) * 100).toFixed(1)
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `pokemon-collection-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            console.log('💾 Collection exportée en JSON');
+        }
+
+        // Importer une collection depuis JSON
+        function importJSON() {
+            document.getElementById('jsonImport').click();
+        }
+
+        // Gestionnaire d'import JSON
+        document.getElementById('jsonImport').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.collection && Array.isArray(data.collection)) {
+                        pokemonCollection = new Set(data.collection);
+                        pokemonDetails = data.details || {};
+                        saveCollection();
+                        updateStatistics();
+                        
+                        statsSection.classList.add('show');
+                        pdfSection.classList.add('show');
+                        
+                        console.log(`📥 Collection importée: ${pokemonCollection.size} Pokémon`);
+                        alert(`Collection importée avec succès !\n${pokemonCollection.size} Pokémon chargés.`);
+                    } else {
+                        throw new Error('Format JSON invalide');
+                    }
+                } catch (error) {
+                    console.error('❌ Erreur import JSON:', error);
+                    showError('Erreur lors de l\'import du fichier JSON');
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        // Fonctions utilitaires
+        function showLoading() {
+            loading.classList.add('show');
+        }
+
+        function hideLoading() {
+            loading.classList.remove('show');
+        }
+
+        function showError(message) {
+            error.textContent = message;
+            error.classList.add('show');
+        }
+
+        function hideError() {
+            error.classList.remove('show');
+        }
+
+        function hideResults() {
+            results.classList.remove('show');
+        }
+
+        // Exposer les fonctions nécessaires globalement
+        window.handleFileSelect = handleFileSelect;
+        window.scanImage = scanImage;
+        window.generatePDF = generatePDF;
+        window.resetCollection = resetCollection;
+        window.exportJSON = exportJSON;
+        window.importJSON = importJSON;
+    </script>
+</body>
+</html>
