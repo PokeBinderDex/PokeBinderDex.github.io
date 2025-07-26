@@ -251,7 +251,7 @@
     <div class="container">
         <div class="header">
             <h1>🎴 Scanner Pokémon</h1>
-            <p>Identifiez automatiquement vos cartes Pokémon</p>
+            <p>Identifiez automatiquement vos cartes Pokémon avec l'IA</p>
         </div>
 
         <div class="scanner-section">
@@ -323,9 +323,12 @@
         </div>
     </div>
 
+    <!-- Client Gradio JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js"></script>
+    
     <script>
-        // Configuration - URL corrigée avec le bon API name
-        const API_URL = 'https://leonheart2b-pokemon-card-scanner.hf.space/api/process_and_format';
+        // Variables globales
+        let gradioClient = null;
         
         // Éléments du DOM
         const uploadArea = document.getElementById('uploadArea');
@@ -342,7 +345,33 @@
         const thresholdValue = document.getElementById('thresholdValue');
         const toleranceSlider = document.getElementById('tolerance');
         const toleranceValue = document.getElementById('toleranceValue');
-        
+
+        // Initialiser le client Gradio
+        async function initGradioClient() {
+            if (!gradioClient) {
+                try {
+                    gradioClient = await window.gradio.Client.connect("leonheart2B/pokemon-card-scanner");
+                    console.log("✅ Client Gradio connecté");
+                } catch (error) {
+                    console.error("❌ Erreur connexion Gradio:", error);
+                    throw error;
+                }
+            }
+            return gradioClient;
+        }
+
+        // Initialisation au chargement de la page
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🚀 Initialisation du scanner Pokémon...');
+            try {
+                await initGradioClient();
+                console.log('✅ Scanner prêt !');
+            } catch (error) {
+                console.error('❌ Échec d\'initialisation:', error);
+                showError('Erreur d\'initialisation. Veuillez recharger la page.');
+            }
+        });
+
         // Mise à jour des valeurs des sliders
         thresholdSlider.addEventListener('input', (e) => {
             thresholdValue.textContent = e.target.value + '%';
@@ -411,42 +440,29 @@
             scanButton.disabled = true;
 
             try {
-                // Convertir l'image en base64 pour Gradio
-                const base64Image = await fileToBase64(file);
+                // Initialiser le client Gradio si nécessaire
+                const client = await initGradioClient();
                 
-                // Préparer les données pour l'API Gradio
-                const requestData = {
-                    data: [
-                        base64Image, // image
-                        document.getElementById('language').value, // lang
-                        parseInt(thresholdSlider.value), // similarity_threshold
-                        parseFloat(toleranceSlider.value), // size_tolerance
-                        document.getElementById('bestOnly').checked, // return_best_only
-                        false // verbose
-                    ]
-                };
+                console.log('📸 Envoi de l\'image:', file.name, file.size, 'bytes');
 
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(requestData)
+                // Utiliser l'API Gradio JavaScript
+                const result = await client.predict("/process_and_format", {
+                    image: file,
+                    lang: document.getElementById('language').value,
+                    similarity_threshold: parseInt(thresholdSlider.value),
+                    size_tolerance: parseFloat(toleranceSlider.value),
+                    return_best_only: document.getElementById('bestOnly').checked,
+                    verbose: false
                 });
 
-                if (!response.ok) {
-                    throw new Error(`Erreur HTTP: ${response.status}`);
-                }
-
-                const data = await response.json();
+                console.log('📋 Réponse reçue:', result);
                 
                 hideLoading();
                 
-                // Gradio retourne [message, details] dans data.data
-                const [message, details] = data.data;
+                // Gradio retourne result.data = [message, details]
+                const [message, details] = result.data;
                 
                 if (message.includes('✅')) {
-                    // Succès - parser les détails Markdown pour extraire les données
                     displayResultsFromMarkdown(message, details);
                 } else {
                     showError(message);
@@ -454,21 +470,11 @@
 
             } catch (err) {
                 hideLoading();
-                showError(`Erreur de connexion: ${err.message}`);
-                console.error('Erreur:', err);
+                showError(`Erreur: ${err.message}`);
+                console.error('❌ Erreur complète:', err);
             } finally {
                 scanButton.disabled = false;
             }
-        }
-
-        // Fonction pour convertir un fichier en base64
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
         }
 
         // Afficher les résultats depuis le format Markdown retourné
@@ -546,44 +552,6 @@
             `;
             
             resultsList.appendChild(card);
-        }
-
-        // Afficher les résultats (ancienne fonction, gardée en fallback)
-        function displayResults(data) {
-            if (!data.pokemon || data.pokemon.length === 0) {
-                showError('Aucun Pokémon détecté');
-                return;
-            }
-
-            resultsList.innerHTML = '';
-            
-            data.pokemon.forEach((pokemon, index) => {
-                const card = document.createElement('div');
-                card.className = 'result-card';
-                
-                const similarity = pokemon.similarity || 0;
-                const confidence = (pokemon.confidence || 0) * 100;
-                
-                card.innerHTML = `
-                    <div class="pokemon-name">${pokemon.name}</div>
-                    <div>
-                        <strong>Similitude:</strong> ${similarity.toFixed(1)}%
-                        <div class="confidence-bar">
-                            <div class="confidence-fill" style="width: ${similarity}%"></div>
-                        </div>
-                    </div>
-                    <div>
-                        <strong>Confiance OCR:</strong> ${confidence.toFixed(1)}%
-                        <div class="confidence-bar">
-                            <div class="confidence-fill" style="width: ${confidence}%"></div>
-                        </div>
-                    </div>
-                `;
-                
-                resultsList.appendChild(card);
-            });
-            
-            results.classList.add('show');
         }
 
         // Fonctions utilitaires
