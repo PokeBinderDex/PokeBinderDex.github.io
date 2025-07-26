@@ -251,7 +251,7 @@
     <div class="container">
         <div class="header">
             <h1>🎴 Scanner Pokémon</h1>
-            <p>Identifiez automatiquement vos cartes Pokémon avec l'IA !!!!!</p>
+            <p>Identifiez automatiquement vos cartes Pokémon</p>
         </div>
 
         <div class="scanner-section">
@@ -324,8 +324,8 @@
     </div>
 
     <script>
-        // Configuration
-        const API_URL = 'https://leonheart2B-pokemon-card-scanner.hf.space/api/predict/detect_pokemon';
+        // Configuration - URL corrigée avec le bon API name
+        const API_URL = 'https://leonheart2b-pokemon-card-scanner.hf.space/api/process_and_format';
         
         // Éléments du DOM
         const uploadArea = document.getElementById('uploadArea');
@@ -410,19 +410,28 @@
             hideResults();
             scanButton.disabled = true;
 
-            // Préparer les données
-            const formData = new FormData();
-            formData.append('image', file);
-            formData.append('lang', document.getElementById('language').value);
-            formData.append('similarity_threshold', thresholdSlider.value);
-            formData.append('size_tolerance', toleranceSlider.value);
-            formData.append('return_best_only', document.getElementById('bestOnly').checked);
-            formData.append('verbose', false);
-
             try {
+                // Convertir l'image en base64 pour Gradio
+                const base64Image = await fileToBase64(file);
+                
+                // Préparer les données pour l'API Gradio
+                const requestData = {
+                    data: [
+                        base64Image, // image
+                        document.getElementById('language').value, // lang
+                        parseInt(thresholdSlider.value), // similarity_threshold
+                        parseFloat(toleranceSlider.value), // size_tolerance
+                        document.getElementById('bestOnly').checked, // return_best_only
+                        false // verbose
+                    ]
+                };
+
                 const response = await fetch(API_URL, {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
                 });
 
                 if (!response.ok) {
@@ -433,10 +442,14 @@
                 
                 hideLoading();
                 
-                if (data.success) {
-                    displayResults(data);
+                // Gradio retourne [message, details] dans data.data
+                const [message, details] = data.data;
+                
+                if (message.includes('✅')) {
+                    // Succès - parser les détails Markdown pour extraire les données
+                    displayResultsFromMarkdown(message, details);
                 } else {
-                    showError(data.message || 'Aucun Pokémon détecté');
+                    showError(message);
                 }
 
             } catch (err) {
@@ -448,7 +461,94 @@
             }
         }
 
-        // Afficher les résultats
+        // Fonction pour convertir un fichier en base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Afficher les résultats depuis le format Markdown retourné
+        function displayResultsFromMarkdown(message, details) {
+            resultsList.innerHTML = '';
+            
+            // Afficher le message principal
+            const messageCard = document.createElement('div');
+            messageCard.className = 'result-card';
+            messageCard.innerHTML = `<div class="pokemon-name">${message}</div>`;
+            resultsList.appendChild(messageCard);
+            
+            // Parser les détails Markdown pour extraire les infos des Pokémon
+            if (details && details.includes('**Détails des détections :**')) {
+                const lines = details.split('\n');
+                let currentPokemon = null;
+                
+                lines.forEach(line => {
+                    line = line.trim();
+                    
+                    // Détection d'un nouveau Pokémon (format: **1. Pikachu**)
+                    const pokemonMatch = line.match(/^\*\*\d+\.\s+(.+?)\*\*$/);
+                    if (pokemonMatch) {
+                        if (currentPokemon) {
+                            createPokemonCard(currentPokemon);
+                        }
+                        currentPokemon = {
+                            name: pokemonMatch[1],
+                            similarity: 0,
+                            confidence: 0
+                        };
+                    }
+                    
+                    // Extraction de la similitude
+                    const simMatch = line.match(/- Similitude\s*:\s*(\d+\.?\d*)%/);
+                    if (simMatch && currentPokemon) {
+                        currentPokemon.similarity = parseFloat(simMatch[1]);
+                    }
+                    
+                    // Extraction de la confiance OCR
+                    const confMatch = line.match(/- Confiance OCR\s*:\s*(\d+\.?\d*)%/);
+                    if (confMatch && currentPokemon) {
+                        currentPokemon.confidence = parseFloat(confMatch[1]);
+                    }
+                });
+                
+                // Ajouter le dernier Pokémon
+                if (currentPokemon) {
+                    createPokemonCard(currentPokemon);
+                }
+            }
+            
+            results.classList.add('show');
+        }
+        
+        // Créer une carte pour un Pokémon
+        function createPokemonCard(pokemon) {
+            const card = document.createElement('div');
+            card.className = 'result-card';
+            
+            card.innerHTML = `
+                <div class="pokemon-name">${pokemon.name}</div>
+                <div>
+                    <strong>Similitude:</strong> ${pokemon.similarity.toFixed(1)}%
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: ${pokemon.similarity}%"></div>
+                    </div>
+                </div>
+                <div>
+                    <strong>Confiance OCR:</strong> ${pokemon.confidence.toFixed(1)}%
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: ${pokemon.confidence}%"></div>
+                    </div>
+                </div>
+            `;
+            
+            resultsList.appendChild(card);
+        }
+
+        // Afficher les résultats (ancienne fonction, gardée en fallback)
         function displayResults(data) {
             if (!data.pokemon || data.pokemon.length === 0) {
                 showError('Aucun Pokémon détecté');
