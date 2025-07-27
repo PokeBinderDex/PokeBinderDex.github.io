@@ -122,12 +122,19 @@ function getPokemonButtonInfo(pokemonName) {
     return null;
 }
 
-// Fonction pour scroller vers la section et mettre en évidence le bouton
+// Fonction pour scroller horizontalement vers la génération et mettre en évidence le bouton
 function scrollToGenerationAndHighlightButton(pokemonName) {
     const buttonInfo = getPokemonButtonInfo(pokemonName);
     if (!buttonInfo) return;
 
-    // Trouver la section de génération
+    // Trouver le container de scroll horizontal
+    const scrollContainer = document.querySelector('.scroll-container');
+    if (!scrollContainer) {
+        console.warn("❌ Container de scroll non trouvé");
+        return;
+    }
+
+    // Trouver la carte de génération cible
     const productCards = document.querySelectorAll('.product-card');
     let targetCard = null;
 
@@ -144,10 +151,19 @@ function scrollToGenerationAndHighlightButton(pokemonName) {
             btn.classList.remove('highlighted');
         });
 
-        // Scroller vers la section (avec un offset pour la centrer)
-        const offsetTop = targetCard.offsetTop - (window.innerHeight / 2) + (targetCard.offsetHeight / 2);
-        window.scrollTo({
-            top: offsetTop,
+        // Calculer la position pour centrer la carte dans le container
+        const containerWidth = scrollContainer.clientWidth;
+        const cardLeft = targetCard.offsetLeft;
+        const cardWidth = targetCard.offsetWidth;
+        
+        // Position pour centrer la carte
+        const scrollPosition = cardLeft - (containerWidth / 2) + (cardWidth / 2);
+        
+        console.log(`🎯 Scroll vers Gen ${buttonInfo.generation} - Position: ${scrollPosition}px`);
+
+        // Scroller horizontalement dans le container
+        scrollContainer.scrollTo({
+            left: Math.max(0, scrollPosition), // Éviter les valeurs négatives
             behavior: 'smooth'
         });
 
