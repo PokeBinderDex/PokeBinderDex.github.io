@@ -283,46 +283,62 @@
                 grid-template-columns: 1fr;
             }
         }
+        
+        details summary {
+            font-weight: bold;
+            font-size: 1.05em;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        
+        details[open] summary::after {
+            content: " ▲";
+        }
+        
+        details summary::after {
+            content: " ▼";
+        }
+        
+        .advanced-controls label {
+            display: block;
+            margin: 12px 0 6px;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .advanced-controls input[type="range"] {
+            width: 100%;
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎴 Scanner Pokémon</h1>
-            <p>Identifiez automatiquement vos cartes en plusieurs langues</p>
+            <h1>Pokemon Scanner</h1>
+            <p>Sort your collection easly </p>
         </div>
 
         <div class="scanner-section">
             <!-- Zone d'upload -->
             <div class="upload-area" id="uploadArea">
                 <div class="upload-icon">📸</div>
-                <h3>Glissez votre image ici ou cliquez pour sélectionner</h3>
-                <p>Formats supportés : JPG, PNG, WebP</p>
+                <h3>Drop your image here or click to select</h3>
                 <input type="file" id="fileInput" class="file-input" accept="image/*">
                 <button type="button" class="upload-btn" onclick="document.getElementById('fileInput').click()">
-                    Choisir une image
+                    Choose an image
                 </button>
             </div>
 
             <!-- Prévisualisation -->
             <img id="preview" class="preview" alt="Prévisualisation">
 
-            <!-- Informations sur les langues -->
-            <div class="language-info">
-                <h4>🌐 Langues supportées</h4>
-                <div class="language-grid">
-                    <div class="language-item">🇺🇸 English</div>
-                    <div class="language-item">🇫🇷 Français</div>
-                    <div class="language-item">🇮🇹 Italiano</div>
-                    <div class="language-item">🇩🇪 Deutsch</div>
-                    <div class="language-item">🇪🇸 Español</div>
-                </div>
-            </div>
+          
 
             <!-- Contrôles -->
             <div class="controls">
                 <div class="control-group">
-                    <label for="language">🌐 Langue OCR et Pokédex</label>
+                    <label for="language">🌐 Your card's language </label>
                     <select id="language">
                         <option value="en">🇺🇸 English</option>
                         <option value="fr">🇫🇷 Français</option>
@@ -331,35 +347,35 @@
                         <option value="es">🇪🇸 Español</option>
                     </select>
                 </div>
-
+                
                 <div class="control-group">
-                    <label for="threshold">🎯 Seuil de similitude (%)</label>
-                    <input type="range" id="threshold" min="50" max="95" value="72">
-                    <span id="thresholdValue">72%</span>
+                    <details>
+                        <summary>⚙️ Paramètres avancés</summary>
+                        <div class="advanced-controls">
+                            <label for="threshold">🎯 Seuil de similitude (%)</label>
+                            <input type="range" id="threshold" min="50" max="95" value="72">
+                            <span id="thresholdValue">72%</span>
+                
+                            <label for="tolerance">📏 Tolérance de taille</label>
+                            <input type="range" id="tolerance" min="0.1" max="1.0" step="0.1" value="0.3">
+                            <span id="toleranceValue">0.3</span>
+                        </div>
+                    </details>
                 </div>
 
-                <div class="control-group">
-                    <label for="tolerance">📏 Tolérance de taille</label>
-                    <input type="range" id="tolerance" min="0.1" max="1.0" step="0.1" value="0.3">
-                    <span id="toleranceValue">0.3</span>
-                </div>
 
-                <div class="control-group">
-                    <label>
-                        <input type="checkbox" id="bestOnly"> 🥇 Meilleur résultat seulement
-                    </label>
-                </div>
+
             </div>
 
             <!-- Bouton de scan -->
             <button id="scanButton" class="scan-btn" disabled>
-                🔍 Scanner les cartes Pokémon
+                🔍 Scan
             </button>
 
             <!-- Loading -->
             <div id="loading" class="loading">
                 <div class="spinner"></div>
-                <p>Analyse en cours... ⚡</p>
+                <p> Working...  ⚡</p>
             </div>
 
             <!-- Erreurs -->
@@ -367,7 +383,7 @@
 
             <!-- Résultats -->
             <div id="results" class="results">
-                <h3>📋 Pokémon détectés :</h3>
+                <h3>📋 Detected pokemons :  :</h3>
                 <div id="resultsList"></div>
             </div>
         </div>
@@ -522,7 +538,7 @@
                     lang: selectedLang,
                     similarity_threshold: parseInt(thresholdSlider.value),
                     size_tolerance: parseFloat(toleranceSlider.value),
-                    return_best_only: document.getElementById('bestOnly').checked,
+                    return_best_only: false,
                     verbose: false
                 });
 
