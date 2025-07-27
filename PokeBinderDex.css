@@ -1095,41 +1095,22 @@ footer {
 
 /* Style pour le bouton en surbrillance (doré) */
 .buy-button.highlighted {
-    background: radial-gradient(ellipse 60% 120% at center, 
-        #ffd700 0%,     /* Or brillant */
-        #ffed4e 25%,    /* Or plus clair */
-        #ff8c00 70%,    /* Orange doré */
-        #ff6b00 100%    /* Orange foncé */
-    ) !important;
+  background: radial-gradient(circle at center, #ffd700 0%, #ff8c00 100%);
+    
+    !important;
     transform: scale(1.05);
     box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-    border: 2px solid #ffd700;
+    border: 2px solid #ffd200;
     animation: goldGlow 2s ease-in-out;
 }
 
-/* Animation de pulsation dorée */
-@keyframes goldGlow {
-    0% {
-        box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-    }
-    50% {
-        box-shadow: 0 6px 25px rgba(255, 215, 0, 0.8);
-        transform: scale(1.08);
-    }
-    100% {
-        box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-        transform: scale(1.05);
-    }
-}
+
 
 /* Effet de hover pour le bouton en surbrillance */
 .buy-button.highlighted:hover {
-    background: radial-gradient(ellipse 60% 120% at center, 
-        #ffed4e 0%, 
-        #ffd700 25%, 
-        #ff8c00 70%, 
-        #ff4500 100%
-    ) !important;
+    background: radial-gradient(circle at center, #fbab0e 0%, #f67d00 100%);
+ 
+     !important;
     transform: scale(1.08);
     box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
 }
