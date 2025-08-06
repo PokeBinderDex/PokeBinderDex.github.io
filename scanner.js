@@ -553,7 +553,7 @@ function displayResults(detectedPokemon, language) {
 
         pokemonListHTML += `
             <div class="pokemon-item">
-                ${pokemonNumber ? `<img src="pokemon_images/${pokemonNumber.toString().padStart(3, '0')}.png" class="pokemon-image" alt="${pokemon.name}" onerror="this.style.display='none'">` : ''}
+                ${pokemonNumber ? `<img src="assets/pokemon_images/${pokemonNumber.toString().padStart(3, '0')}.png" class="pokemon-image" alt="${pokemon.name}" onerror="this.style.display='none'">` : ''}
                 <span class="pokemon-name">${pokemon.name}</span>
                 ${pokemonNumber ? `<span class="pokemon-number">#${pokemonNumber.toString().padStart(3, '0')}</span>` : ''}
             </div>
@@ -663,7 +663,7 @@ function displayStats(stats) {
                 
                 statItem.innerHTML = `
                     <span class="stat-label">
-                        <img src="types/${type.toLowerCase()}.png" class="type-icon" alt="${type}" onerror="this.style.display='none'">
+                        <img src="assets/types/${type.toLowerCase()}.png" class="type-icon" alt="${type}" onerror="this.style.display='none'">
                         ${type}
                     </span>
                     <div>
