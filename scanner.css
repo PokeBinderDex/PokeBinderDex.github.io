@@ -6,22 +6,15 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: white;
     min-height: 100vh;
-    padding: 20px;
+
 }
 
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-    overflow: hidden;
-}
+
 
 .header {
-    background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+    background: linear-gradient(45deg, #9ed1fe, #fc5160);
     color: white;
     padding: 30px;
     text-align: center;
@@ -184,6 +177,12 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
+.pokemon-source {
+    font-size: 0.60em;
+    color: #9fc2ff;
+    font-weight: 370;
+}
+
 .pokemon-list {
     display: flex;
     flex-wrap: wrap;
@@ -263,10 +262,11 @@ body {
 
 .stats-container {
     margin-top: 30px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: 20px;
 }
+
 
 .stat-card {
     background: white;
@@ -347,6 +347,7 @@ body {
 .type-stat {
     border-left-color: rgb(246, 251, 203)
 }
+
 
 .legendary-stat {
     border-left-color: #ffbcbc;
@@ -596,4 +597,67 @@ body {
     text-align: center;
     font-weight: 600;
     color: #374151;
+}
+
+
+.type-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.type-stat-item {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.type-stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.type-label-with-icon {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.type-main-value {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.type-stat-bar {
+    background: #e5e7eb;
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 8px 0;
+}
+
+.type-stat-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #9bc4ff, #fc5160);
+    transition: width 0.5s ease;
+}
+
+.type-details-compact {
+    margin-top: 10px;
+    padding: 8px;
+    background: #f9fafb;
+    border-radius: 6px;
+    font-size: 0.85em;
+}
+
+.type-breakdown-compact {
+    display: flex;
+    justify-content: space-between;
+    margin: 2px 0;
+    font-size: 0.8em;
 }

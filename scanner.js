@@ -1,5 +1,5 @@
 // Pokemon Scanner - PokeBinderDex
-// Version with multi-image processing
+// Version with multi-image processing and image source tracking in PDF
 
 import { POKEDEX, POKEMON_DATA, GENERATIONS, LEGENDARY_POKEMON, STARTER_POKEMON } from './pokedex.js';
 
@@ -162,8 +162,6 @@ const errorList = document.getElementById('errorList');
 const results = document.getElementById('results');
 const resultsList = document.getElementById('resultsList');
 
-
-
 const languageSelect = document.getElementById('language');
 
 // Initialiser le client Gradio
@@ -192,8 +190,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         showError('Erreur d\'initialisation. Veuillez recharger la page.');
     }
 });
-
-
 
 // Drag & drop handling
 uploadArea.addEventListener('dragover', (e) => {
@@ -367,6 +363,7 @@ async function processAllImages() {
                 if (message.includes('✅')) {
                     imageItem.status = 'completed';
                     imageItem.result = { message, details };
+                    imageItem.imageIndex = i + 1; // Stocker l'index de l'image
                     processedResults.push(imageItem);
                     updateImageStatus(imageItem.id, 'completed', 'Completed');
                 } else {
@@ -390,8 +387,8 @@ async function processAllImages() {
             await new Promise(resolve => setTimeout(resolve, 250));
         }
         
-        // Compiler tous les Pokémon détectés
-        const allDetectedPokemon = compileAllDetectedPokemon(selectedLang);
+        // Compiler tous les Pokémon détectés avec leur source d'image
+        const allDetectedPokemon = compileAllDetectedPokemonWithSource(selectedLang);
         
         // Afficher les résultats avec les statistiques et le PDF
         displayResults(allDetectedPokemon, selectedLang);
@@ -406,28 +403,38 @@ async function processAllImages() {
     }
 }
 
-// Compiler tous les Pokémon détectés depuis toutes les images
-function compileAllDetectedPokemon(language) {
+// Compiler tous les Pokémon détectés depuis toutes les images avec leur source
+function compileAllDetectedPokemonWithSource(language) {
     const allPokemon = [];
-    const pokemonNames = new Set(); // Pour éviter les doublons
+    const pokemonSources = new Map(); // Map pour stocker les sources de chaque Pokémon
     
     processedResults.forEach(imageItem => {
         const { details } = imageItem.result;
+        const imageNumber = imageItem.imageIndex;
         
         if (details && details.includes('**Détails des détections :**')) {
             const imagePokemon = parseImageResults(details, language);
             
             imagePokemon.forEach(pokemon => {
                 const normalizedName = pokemon.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                if (!pokemonNames.has(normalizedName)) {
-                    pokemonNames.add(normalizedName);
+                
+                // Si le Pokémon n'a pas encore été ajouté
+                if (!pokemonSources.has(normalizedName)) {
+                    pokemon.imageSource = imageNumber;
+                    pokemonSources.set(normalizedName, imageNumber);
                     allPokemon.push(pokemon);
                 }
+                // Si le Pokémon existe déjà, on garde la première occurrence mais on peut noter les autres sources
             });
         }
     });
     
     return allPokemon;
+}
+
+// Compiler tous les Pokémon détectés depuis toutes les images (version originale pour compatibilité)
+function compileAllDetectedPokemon(language) {
+    return compileAllDetectedPokemonWithSource(language);
 }
 
 // Parser les résultats d'une image
@@ -556,6 +563,7 @@ function displayResults(detectedPokemon, language) {
                 ${pokemonNumber ? `<img src="assets/pokemon_images/${pokemonNumber.toString().padStart(3, '0')}.png" class="pokemon-image" alt="${pokemon.name}" onerror="this.style.display='none'">` : ''}
                 <span class="pokemon-name">${pokemon.name}</span>
                 ${pokemonNumber ? `<span class="pokemon-number">#${pokemonNumber.toString().padStart(3, '0')}</span>` : ''}
+                ${pokemon.imageSource ? `<span class="pokemon-source">(Img ${pokemon.imageSource})</span>` : ''}
             </div>
         `;
     });
@@ -645,52 +653,57 @@ function displayStats(stats) {
         statsContainer.appendChild(genCard);
     }
 
-    // Type statistics with detailed breakdown
-    if (Object.keys(stats.types).length > 0) {
-        const typeCard = document.createElement('div');
-        typeCard.className = 'stat-card type-stat';
-        typeCard.innerHTML = '<h4>Type Statistics</h4>';
-        
-        Object.entries(stats.types)
-            .sort(([,a], [,b]) => b.count - a.count)
-            .forEach(([type, data]) => {
-                const statItem = document.createElement('div');
-                statItem.className = 'stat-item';
-                
-                // Calculate percentage of this type in total Pokedex
-                const totalOfThisType = getTotalPokemonOfType(type);
-                const globalTypePercentage = totalOfThisType > 0 ? (data.count / totalOfThisType) * 100 : 0;
-                
-                statItem.innerHTML = `
-                    <span class="stat-label">
+// Type statistics with detailed breakdown
+if (Object.keys(stats.types).length > 0) {
+    const typeCard = document.createElement('div');
+    typeCard.className = 'stat-card type-stat';
+    typeCard.innerHTML = '<h4>Type Statistics</h4>';
+    
+    // Créer la grille pour les types
+    const typeGrid = document.createElement('div');
+    typeGrid.className = 'type-stats-grid';
+    
+    Object.entries(stats.types)
+        .sort(([,a], [,b]) => b.count - a.count)
+        .forEach(([type, data]) => {
+            const typeStatItem = document.createElement('div');
+            typeStatItem.className = 'type-stat-item';
+            
+            // Calculate percentage of this type in total Pokedex
+            const totalOfThisType = getTotalPokemonOfType(type);
+            const globalTypePercentage = totalOfThisType > 0 ? (data.count / totalOfThisType) * 100 : 0;
+            
+            typeStatItem.innerHTML = `
+                <div class="type-stat-header">
+                    <div class="type-label-with-icon">
                         <img src="assets/types/${type.toLowerCase()}.png" class="type-icon" alt="${type}" onerror="this.style.display='none'">
-                        ${type}
-                    </span>
-                    <div>
-                        <span class="stat-value">${data.count} (${data.percentage.toFixed(1)}% of collection)</span>
-                        <div class="stat-bar">
-                            <div class="stat-bar-fill" style="width: ${data.percentage}%"></div>
-                        </div>
-                        <div class="type-details">
-                            <div>Global ${type}: ${globalTypePercentage.toFixed(1)}% (${data.count}/${totalOfThisType})</div>
-                            ${Object.entries(data.generationBreakdown)
-                                .filter(([, count]) => count > 0)
-                                .map(([gen, count]) => {
-                                    const genTotalOfType = getTotalPokemonOfTypeInGeneration(type, gen);
-                                    const genPercentage = genTotalOfType > 0 ? (count / genTotalOfType) * 100 : 0;
-                                    return `<div class="type-breakdown">
-                                        <span>${gen}:</span>
-                                        <span>${genPercentage.toFixed(1)}% (${count}/${genTotalOfType})</span>
-                                    </div>`;
-                                }).join('')}
-                        </div>
+                        <span class="stat-label">${type}</span>
                     </div>
-                `;
-                typeCard.appendChild(statItem);
-            });
-        
-        statsContainer.appendChild(typeCard);
-    }
+                    <span class="type-main-value">${data.count} (${data.percentage.toFixed(1)}%)</span>
+                </div>
+                <div class="type-stat-bar">
+                    <div class="type-stat-bar-fill" style="width: ${data.percentage}%"></div>
+                </div>
+                <div class="type-details-compact">
+                    <div class="type-global-stat">Global ${type}: ${globalTypePercentage.toFixed(1)}% (${data.count}/${totalOfThisType})</div>
+                    ${Object.entries(data.generationBreakdown)
+                        .filter(([, count]) => count > 0)
+                        .map(([gen, count]) => {
+                            const genTotalOfType = getTotalPokemonOfTypeInGeneration(type, gen);
+                            const genPercentage = genTotalOfType > 0 ? (count / genTotalOfType) * 100 : 0;
+                            return `<div class="type-breakdown-compact">
+                                <span>${gen}:</span>
+                                <span>${genPercentage.toFixed(1)}% (${count}/${genTotalOfType})</span>
+                            </div>`;
+                        }).join('')}
+                </div>
+            `;
+            typeGrid.appendChild(typeStatItem);
+        });
+    
+    typeCard.appendChild(typeGrid);
+    statsContainer.appendChild(typeCard);
+}
 
     // Special statistics
     const specialCard = document.createElement('div');
@@ -796,7 +809,7 @@ window.scanImage = scanImage;
 window.removeImage = window.removeImage;
 window.clearQueue = window.clearQueue;
 
-// Génération PDF - VERSION ORIGINALE CONSERVÉE
+// Génération PDF avec source d'image
 async function generatePDFChecklist(detectedPokemon, language) {
     const pdfBtn = document.getElementById('downloadPdfBtn');
     const originalText = pdfBtn.innerHTML;
@@ -817,10 +830,12 @@ async function generatePDFChecklist(detectedPokemon, language) {
         const languageName = LANGUAGE_NAMES[language] || 'English';
         const pokemonMap = parsePokemonData();
         
-        // Create a set of detected Pokemon names for quick lookup
-        const detectedNames = new Set(
-            detectedPokemon.map(p => p.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""))
-        );
+        // Create a map of detected Pokemon with their image sources
+        const detectedPokemonMap = new Map();
+        detectedPokemon.forEach(pokemon => {
+            const normalizedName = pokemon.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            detectedPokemonMap.set(normalizedName, pokemon.imageSource);
+        });
         
         // Title
         doc.setFontSize(20);
@@ -857,9 +872,10 @@ async function generatePDFChecklist(detectedPokemon, language) {
             const pokemonName = pokedex[i];
             const pokemonData = pokemonMap.get(pokemonNumber);
             
-            // Check if Pokemon was detected
+            // Check if Pokemon was detected and get its image source
             const normalizedName = pokemonName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            const isDetected = detectedNames.has(normalizedName);
+            const isDetected = detectedPokemonMap.has(normalizedName);
+            const imageSource = detectedPokemonMap.get(normalizedName);
             
             // Check if we need a new page
             if (yPosition > pageHeight - 30) {
@@ -919,9 +935,16 @@ async function generatePDFChecklist(detectedPokemon, language) {
             Object.entries(GENERATIONS).forEach(([gen, range]) => {
                 if (pokemonNumber >= range.min && pokemonNumber <= range.max) {
                     doc.setTextColor(150, 150, 150);
-                    doc.text(gen, margin + 140, yPosition);
+                    doc.text(gen, margin + 125, yPosition);
                 }
             });
+            
+            // Add image source if detected
+            if (isDetected && imageSource) {
+                doc.setTextColor(70, 130, 255); // Blue for image source
+                doc.setFont(undefined, 'italic');
+                doc.text(`Img ${imageSource}`, margin + 150, yPosition);
+            }
             
             // Reset color and font
             doc.setTextColor(0, 0, 0);
@@ -999,6 +1022,80 @@ async function generatePDFChecklist(detectedPokemon, language) {
                 doc.text(`  Starter Pokemon: ${stats.starter.count}/${STARTER_POKEMON.size} (${stats.starter.percentage.toFixed(1)}%)`, 25, yPosition);
                 yPosition += 8;
             }
+        }
+        
+        // Add detected Pokemon list with image sources
+        if (detectedPokemon.length > 0) {
+            yPosition += 15;
+            doc.setFont(undefined, 'bold');
+            doc.text('Detected Pokemon by Image:', 20, yPosition);
+            doc.setFont(undefined, 'normal');
+            yPosition += 10;
+            
+            // Group Pokemon by image source
+            const pokemonByImage = new Map();
+            detectedPokemon.forEach(pokemon => {
+                const imageNum = pokemon.imageSource || 'Unknown';
+                if (!pokemonByImage.has(imageNum)) {
+                    pokemonByImage.set(imageNum, []);
+                }
+                pokemonByImage.get(imageNum).push(pokemon);
+            });
+            
+            // Sort by image number
+            const sortedImages = Array.from(pokemonByImage.keys()).sort((a, b) => {
+                if (a === 'Unknown') return 1;
+                if (b === 'Unknown') return -1;
+                return parseInt(a) - parseInt(b);
+            });
+            
+            sortedImages.forEach(imageNum => {
+                const pokemonInImage = pokemonByImage.get(imageNum);
+                
+                // Check if we need a new page
+                if (yPosition > pageHeight - 40) {
+                    doc.addPage();
+                    pageNumber++;
+                    yPosition = 20;
+                    
+                    // Add page number
+                    doc.setFontSize(8);
+                    doc.text(`Page ${pageNumber}`, 180, pageHeight - 10);
+                    doc.setFontSize(11);
+                }
+                
+                doc.setFont(undefined, 'bold');
+                doc.text(`Image ${imageNum}:`, 25, yPosition);
+                doc.setFont(undefined, 'normal');
+                yPosition += 8;
+                
+                pokemonInImage.forEach(pokemon => {
+                    const pokedex = POKEDEX[pokemon.language] || POKEDEX['en'];
+                    const index = pokedex.indexOf(pokemon.name);
+                    const pokemonNumber = index !== -1 ? index + 1 : null;
+                    
+                    const pokemonText = pokemonNumber ? 
+                        `  #${pokemonNumber.toString().padStart(3, '0')} ${pokemon.name}` : 
+                        `  ${pokemon.name}`;
+                    
+                    doc.text(pokemonText, 30, yPosition);
+                    yPosition += 6;
+                    
+                    // Check if we need a new page
+                    if (yPosition > pageHeight - 30) {
+                        doc.addPage();
+                        pageNumber++;
+                        yPosition = 20;
+                        
+                        // Add page number
+                        doc.setFontSize(8);
+                        doc.text(`Page ${pageNumber}`, 180, pageHeight - 10);
+                        doc.setFontSize(11);
+                    }
+                });
+                
+                yPosition += 5; // Extra space between images
+            });
         }
         
         // Save the PDF
