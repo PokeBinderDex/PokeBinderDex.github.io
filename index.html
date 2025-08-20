@@ -27,6 +27,7 @@
     <script src="bandeau_script.js" defer></script>
     <script src="search_database.js"></script>
     <script src="search_functionality.js" defer></script>
+    <script src="votes.js" defer></script>
 </head>
 <body>
   
@@ -51,7 +52,9 @@
       <p>📊 Quality upgrade on real-cards based pdfs</p>
       <p>🎨 Personalised Dexs</p>
     </div>
+
   </div>
+<a href="#votes" class="polls-btn">📊 Polls </a>
 
 
     </header>
@@ -655,6 +658,53 @@
                 </div>
             </div>
         </section>
+
+ <div class="votes" id="votes">
+    <h2 class="section-title">Extension Card Votes</h2>
+    <p class="votes-description">
+        Which <b>full art</b>card would you most like to see, in the future, with its background <b>hand-extended </b>by an <b>artist</b>, turning it into a full binder page that truly stands out in your collection?
+    </p>
+
+
+<style>
+.votes-description {
+    font-size: 1.05rem;        /* légèrement plus grand que le texte normal */
+    line-height: 1.6;          /* interligne agréable pour la lecture */
+    color: #555;               /* gris doux, moins agressif que noir */
+    margin-bottom: 1.2rem;     /* espace sous le paragraphe */
+    font-family: 'Arial', sans-serif;
+}
+</style>
+    
+    <div class="vote-grid" id="cardGrid">
+        <!-- Les cartes seront générées par JS -->
+    </div>
+
+    <div class="comment-section">
+        <label for="commentInput" class="comment-label">
+            💬 Comments (optionnal)
+        </label>
+        <textarea 
+            id="commentInput" 
+            class="comment-input" 
+            placeholder="Why is this card your favorite ?"
+        ></textarea>
+    </div>
+
+    <button id="voteButton" class="vote-button">
+        🗳️ VOTE FOR THIS CARD !
+    </button>
+
+    <div id="message"></div>
+
+    <div class="results-section">
+        <h3 class="results-title"> Ranking </h3>
+        <div id="results" class="loading"> Results...</div>
+        <div id="totalVotes" class="total-votes"></div>
+        <button id="refreshButton" class="refresh-button">🔄 Refresh</button>
+    </div>
+</div>
+
     </div>
 
     <footer>

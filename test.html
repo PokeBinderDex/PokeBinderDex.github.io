@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vote Cartes Pokémon</title>
+    <style>
+        :root {
+            --primary-blue: #3d7dca;
+            --primary-yellow: #ffcb05;
+            --border-radius: 15px;
+            --box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            --pokemon-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .pokemon-title {
+            font-size: 3.5em;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--primary-yellow), var(--primary-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            color: white;
+            font-size: 1.3em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        #votes {
+            background-color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin: 40px 0;
+            border: 1px solid #f1faee;
+        }
+
+        .vote-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card-option {
+            border: 3px solid transparent;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(white, white) padding-box,
+                        var(--pokemon-gradient) border-box;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border-color: var(--primary-yellow);
+        }
+
+        .card-option.selected {
+            border-color: var(--primary-yellow);
+            background: linear-gradient(#fff8e1, #fff8e1) padding-box,
+                        linear-gradient(45deg, var(--primary-yellow), var(--primary-blue)) border-box;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(255, 203, 5, 0.3);
+        }
+
+        .card-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .card-image {
+            width: 80px;
+            height: 112px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #666;
+            flex-shrink: 0;
+            border: 2px solid #e0e0e0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .card-info {
+            flex: 1;
+        }
+
+        .card-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+
+        .card-set {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .set-logo {
+            width: 24px;
+            height: 24px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            border: 1px solid #dee2e6;
+        }
+
+        .set-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 3px;
+        }
+
+        .comment-section {
+            margin: 20px 0;
+        }
+
+        .comment-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            font-size: 1em;
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .comment-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(61, 125, 202, 0.1);
+        }
+
+        .vote-button {
+            background: var(--pokemon-gradient);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: var(--border-radius);
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vote-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .vote-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .vote-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .vote-button:hover::before {
+            left: 100%;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin: 20px 0;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .results-section {
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-top: 30px;
+        }
+
+        .results-title {
+            font-size: 2em;
+            text-align: center;
+            margin-bottom: 30px;
+            background: var(--pokemon-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+        }
+
+        .result-item {
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            border-left: 5px solid var(--primary-blue);
+            transition: all 0.3s ease;
+        }
+
+        .result-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .result-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #2c3e50;
+        }
+
+        .result-rank {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .rank-1 { color: #ffd700; }
+        .rank-2 { color: #c0c0c0; }
+        .rank-3 { color: #cd7f32; }
+
+        .result-bar {
+            background: #e9ecef;
+            height: 25px;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .result-progress {
+            background: var(--pokemon-gradient);
+            height: 100%;
+            transition: width 1s ease;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .result-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .result-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .total-votes {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 1.2em;
+            color: var(--primary-blue);
+            font-weight: bold;
+        }
+
+        .loading {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 40px;
+        }
+
+        .refresh-button {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-button:hover {
+            background: #2c5aa0;
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .pokemon-title {
+                font-size: 2.5em;
+            }
+            
+            .vote-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .card-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .card-image {
+                width: 120px;
+                height: 168px;
+            }
+        }
+
+        .pokemon-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.05;
+            z-index: -1;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="20" fill="none" stroke="white" stroke-width="2"/><circle cx="50" cy="50" r="8" fill="white"/></svg>');
+            background-size: 100px 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="pokemon-bg"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1 class="pokemon-title">⚡ VOTE CARTES POKÉMON ⚡</h1>
+            <p class="subtitle">🎴 Votez pour votre carte Pokémon préférée !</p>
+        </div>
+
+        <div id="votes">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">Choisissez votre carte favorite</h2>
+            
+            <div class="vote-grid" id="cardGrid">
+                <!-- Les cartes seront générées par JS -->
+            </div>
+
+            <div class="comment-section">
+                <label for="commentInput" style="display: block; margin-bottom: 10px; font-weight: bold; color: #2c3e50;">
+                    💬 Commentaire (optionnel)
+                </label>
+                <textarea 
+                    id="commentInput" 
+                    class="comment-input" 
+                    placeholder="Pourquoi cette carte est votre préférée ? Partagez votre passion !"
+                ></textarea>
+            </div>
+
+            <button id="voteButton" class="vote-button">
+                🗳️ VOTER POUR CETTE CARTE !
+            </button>
+
+            <div id="message"></div>
+        </div>
+
+        <div class="results-section">
+            <h2 class="results-title">🏆 CLASSEMENT EN TEMPS RÉEL</h2>
+            <div id="results" class="loading">⚡ Chargement des résultats...</div>
+            <div id="totalVotes" class="total-votes"></div>
+            <div style="text-align: center;">
+                <button id="refreshButton" class="refresh-button">🔄 Actualiser</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ⚠️ REMPLACE par l'URL de ton Space Hugging Face
+        const GRADIO_SPACE_URL = 'https://ton-username-vote-pokemon.hf.space';
+        
+        // Données des cartes avec chemins d'images
+        const pokemonCards = [
+            { id: 1, name: "Charizard Ex (& cie)", set: "151", cardImg: "images/charizard-ex.jpg", setImg: "images/151-logo.png" },
+            { id: 2, name: "Blastoise Ex", set: "151", cardImg: "images/blastoise-ex.jpg", setImg: "images/151-logo.png" },
+            { id: 3, name: "Venusaur Ex", set: "151", cardImg: "images/venusaur-ex.jpg", setImg: "images/151-logo.png" },
+            { id: 4, name: "Zapdos Ex", set: "151", cardImg: "images/zapdos-ex.jpg", setImg: "images/151-logo.png" },
+            { id: 5, name: "Alakazam Ex", set: "151", cardImg: "images/alakazam-ex.jpg", setImg: "images/151-logo.png" },
+            { id: 6, name: "Mew Ex", set: "Paldean Fates", cardImg: "images/mew-ex.jpg", setImg: "images/paldean-fates-logo.png" },
+            { id: 7, name: "Poliwhirl", set: "151", cardImg: "images/poliwhirl.jpg", setImg: "images/151-logo.png" },
+            { id: 8, name: "Gardevoir Ex", set: "Paldean Fates", cardImg: "images/gardevoir-ex.jpg", setImg: "images/paldean-fates-logo.png" },
+            { id: 9, name: "Eevee", set: "Twilight Masquerade", cardImg: "images/eevee.jpg", setImg: "images/twilight-masquerade-logo.png" },
+            { id: 10, name: "Chansey", set: "Twilight Masquerade", cardImg: "images/chansey.jpg", setImg: "images/twilight-masquerade-logo.png" },
+            { id: 11, name: "Bulbasaur", set: "Stellar Crown", cardImg: "images/bulbasaur.jpg", setImg: "images/stellar-crown-logo.png" },
+            { id: 12, name: "Squirtle", set: "Stellar Crown", cardImg: "images/squirtle.jpg", setImg: "images/stellar-crown-logo.png" },
+            { id: 13, name: "Latios & Latias", set: "Surging Spark", cardImg: "images/latios-latias.jpg", setImg: "images/surging-spark-logo.png" },
+            { id: 14, name: "N's Reshiram", set: "Journey Together", cardImg: "images/ns-reshiram.jpg", setImg: "images/journey-together-logo.png" },
+            { id: 15, name: "Cleffa", set: "Obsidian Flames", cardImg: "images/cleffa.jpg", setImg: "images/obsidian-flames-logo.png" }
+        ];
+
+        let selectedCard = null;
+        let hasVoted = false;
+
+        // Générer les cartes
+        function generateCards() {
+            const cardGrid = document.getElementById('cardGrid');
+            cardGrid.innerHTML = '';
+
+            pokemonCards.forEach(card => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'card-option';
+                cardElement.dataset.cardId = card.id;
+                
+                cardElement.innerHTML = `
+                    <div class="card-content">
+                        <div class="card-image">
+                            <img src="${card.cardImg}" alt="${card.name}" onerror="this.style.display='none'; this.parentNode.innerHTML='🎴';">
+                        </div>
+                        <div class="card-info">
+                            <div class="card-name">${card.name}</div>
+                            <div class="card-set">
+                                <div class="set-logo">
+                                    <img src="${card.setImg}" alt="${card.set}" onerror="this.style.display='none'; this.parentNode.innerHTML='⭐';">
+                                </div>
+                                ${card.set}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                cardElement.addEventListener('click', () => selectCard(card.id));
+                cardGrid.appendChild(cardElement);
+            });
+        }
+
+        // Sélectionner une carte
+        function selectCard(cardId) {
+            if (hasVoted) return;
+
+            // Retirer la sélection précédente
+            document.querySelectorAll('.card-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+
+            // Sélectionner la nouvelle carte
+            const cardElement = document.querySelector(`[data-card-id="${cardId}"]`);
+            cardElement.classList.add('selected');
+            selectedCard = cardId;
+
+            // Activer le bouton de vote
+            const voteButton = document.getElementById('voteButton');
+            voteButton.disabled = false;
+            voteButton.textContent = `🗳️ VOTER POUR ${pokemonCards.find(c => c.id === cardId).name.toUpperCase()} !`;
+        }
+
+        // Afficher un message
+        function showMessage(text, type = 'success') {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageDiv.innerHTML = '';
+                }, 8000);
+            }
+        }
+
+        // Voter
+        async function vote() {
+            if (!selectedCard) {
+                showMessage('⚠️ Veuillez sélectionner une carte avant de voter !', 'error');
+                return;
+            }
+
+            if (hasVoted) {
+                showMessage('❌ Vous avez déjà voté !', 'error');
+                return;
+            }
+
+            const comment = document.getElementById('commentInput').value;
+            const voteButton = document.getElementById('voteButton');
+            
+            try {
+                // Désactiver le bouton
+                voteButton.disabled = true;
+                voteButton.textContent = '⏳ Vote en cours...';
+                
+                showMessage('🗳️ Envoi de votre vote...', 'success');
+
+                // Appel à l'API Gradio
+                const response = await fetch(`${GRADIO_SPACE_URL}/api/predict`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        data: [selectedCard, comment],
+                        fn_index: 0 // Index de la fonction vote_for_option
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.data && result.data[0]) {
+                    const message = result.data[0];
+                    
+                    if (message.includes('✅')) {
+                        hasVoted = true;
+                        showMessage(message, 'success');
+                        
+                        // Désactiver toutes les cartes
+                        document.querySelectorAll('.card-option').forEach(el => {
+                            el.style.opacity = '0.6';
+                            el.style.pointerEvents = 'none';
+                        });
+                        
+                        voteButton.textContent = '✅ VOTE ENREGISTRÉ';
+                        voteButton.style.background = '#28a745';
+                        
+                        // Actualiser les résultats
+                        setTimeout(loadResults, 2000);
+                    } else {
+                        showMessage(message, 'error');
+                        voteButton.disabled = false;
+                        voteButton.textContent = `🗳️ VOTER POUR ${pokemonCards.find(c => c.id === selectedCard).name.toUpperCase()} !`;
+                    }
+                } else {
+                    throw new Error('Réponse inattendue du serveur');
+                }
+
+            } catch (error) {
+                console.error('Erreur lors du vote:', error);
+                showMessage('❌ Erreur de connexion. Veuillez réessayer.', 'error');
+                
+                voteButton.disabled = false;
+                voteButton.textContent = selectedCard ? 
+                    `🗳️ VOTER POUR ${pokemonCards.find(c => c.id === selectedCard).name.toUpperCase()} !` : 
+                    '🗳️ VOTER POUR CETTE CARTE !';
+            }
+        }
+
+        // Charger les résultats
+        async function loadResults() {
+            try {
+                const response = await fetch(`${GRADIO_SPACE_URL}/api/predict`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        data: [],
+                        fn_index: 2 // Index de la fonction get_results_json
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.data && result.data[0]) {
+                    const jsonData = JSON.parse(result.data[0]);
+                    displayResults(jsonData);
+                } else {
+                    throw new Error('Pas de données de résultats');
+                }
+
+            } catch (error) {
+                console.error('Erreur lors du chargement des résultats:', error);
+                document.getElementById('results').innerHTML = 
+                    `<div class="error">⚠️ Impossible de charger les résultats. 
+                     <a href="${GRADIO_SPACE_URL}" target="_blank" style="color: #007bff;">Voir sur Gradio</a></div>`;
+            }
+        }
+
+        // Afficher les résultats
+        function displayResults(data) {
+            const resultsDiv = document.getElementById('results');
+            const totalVotesDiv = document.getElementById('totalVotes');
+            
+            if (data.error) {
+                resultsDiv.innerHTML = `<div class="error">❌ Erreur: ${data.error}</div>`;
+                return;
+            }
+
+            // Convertir et trier les résultats
+            const resultsArray = Object.values(data.results).sort((a, b) => b.votes - a.votes);
+            
+            let resultsHTML = '';
+            
+            resultsArray.forEach((result, index) => {
+                const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : '';
+                const rankEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+                
+                resultsHTML += `
+                    <div class="result-item">
+                        <div class="result-header">
+                            <div class="result-name">${result.name}</div>
+                            <div class="result-rank ${rankClass}">${rankEmoji}</div>
+                        </div>
+                        <div class="result-bar">
+                            <div class="result-progress" style="width: ${result.percentage}%"></div>
+                        </div>
+                        <div class="result-stats">
+                            <span>${result.votes} votes</span>
+                            <span>${result.percentage}%</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsDiv.innerHTML = resultsHTML;
+            totalVotesDiv.innerHTML = `🗳️ Total: ${data.total_votes} votes`;
+        }
+
+        // Event listeners
+        document.getElementById('voteButton').addEventListener('click', vote);
+        document.getElementById('refreshButton').addEventListener('click', loadResults);
+
+        // Initialisation
+        generateCards();
+        loadResults();
+        
+        // Actualiser les résultats toutes les 30 secondes
+        setInterval(loadResults, 30000);
+    </script>
+</body>
+</html>
