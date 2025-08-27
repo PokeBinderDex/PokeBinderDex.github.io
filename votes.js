@@ -339,7 +339,7 @@ async function vote() {
             
             if (message.includes('✅')) {
                 hasVoted = true;
-                showMessage(message, 'success');
+                
                 
                 // Désactiver toutes les cartes
                 document.querySelectorAll('.card-option').forEach(el => {
