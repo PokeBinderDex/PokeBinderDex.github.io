@@ -348,7 +348,7 @@ async function vote() {
                 });
                 
                 if (voteButton) {
-                    voteButton.textContent = '✅ VOTE SAVED';
+                    voteButton.textContent = '✅ VOTE SAVED, PROMO : WELCOMEDEX5';
                     voteButton.style.background = '#28a745';
                 }
                 
