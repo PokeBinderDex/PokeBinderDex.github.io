@@ -1741,3 +1741,18 @@ footer {
 }
 
 
+.percentage-reduction2 {
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 0px;
+    color: rgb(255, 255, 255);
+    
+    /* Pour donner un effet "exposant" */
+    vertical-align: super;
+    font-size: 1.2rem;
+
+    /* Rotation du texte */
+    display: inline-block; /* nécessaire pour rotate */
+    transform: rotate(20deg);
+}
