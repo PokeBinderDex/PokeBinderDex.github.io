@@ -499,7 +499,7 @@ function updateImageStatus(imageId, status, statusText) {
 function updateProgress(current, total) {
     const percentage = (current / total) * 100;
     progressFill.style.width = `${percentage}%`;
-    progressText.textContent = `${current} / ${total} images traitées`;
+    progressText.textContent = `${current} / ${total} images scanned`;
 }
 
 // Scan image (pour compatibilité avec l'ancien code)
@@ -603,14 +603,86 @@ function showProcessingErrors() {
     resultsList.appendChild(errorCard);
 }
 
-// Display statistics - VERSION ORIGINALE CONSERVÉE
+// Dictionnaire des couleurs pour les types Pokémon
+const TYPE_COLORS = {
+    'Normal': '#A8A878',
+    'Fire': '#F08030',
+    'Water': '#6890F0',
+    'Electric': '#F8D030',
+    'Grass': '#78C850',
+    'Ice': '#98D8D8',
+    'Fighting': '#C03028',
+    'Poison': '#A040A0',
+    'Ground': '#E0C068',
+    'Flying': '#A890F0',
+    'Psychic': '#F85888',
+    'Bug': '#A8B820',
+    'Rock': '#B8A038',
+    'Ghost': '#705898',
+    'Dragon': '#7038F8',
+    'Dark': '#705848',
+    'Steel': '#B8B8D0',
+    'Fairy': '#EE99AC'
+};
+
+// Version plus claire pour les arrière-plans
+const TYPE_BACKGROUND_COLORS = {
+    'Normal': '#A8A87820',
+    'Fire': '#F0803020',
+    'Water': '#6890F020',
+    'Electric': '#F8D03020',
+    'Grass': '#78C85020',
+    'Ice': '#98D8D820',
+    'Fighting': '#C0302820',
+    'Poison': '#A040A020',
+    'Ground': '#E0C06820',
+    'Flying': '#A890F020',
+    'Psychic': '#F8588820',
+    'Bug': '#A8B82020',
+    'Rock': '#B8A03820',
+    'Ghost': '#70589820',
+    'Dragon': '#7038F820',
+    'Dark': '#70584820',
+    'Steel': '#B8B8D020',
+    'Fairy': '#EE99AC20'
+};
+
+// Fonction modifiée pour displayStats avec fond coloré pour le type favori
 function displayStats(stats) {
     const statsContainer = document.createElement('div');
     statsContainer.className = 'stats-container';
     
-    // Global statistics
+    // Global statistics with promotion
     const globalCard = document.createElement('div');
     globalCard.className = 'stat-card global-stat';
+    
+    // Determine encouragement message based on completion percentage
+    let promotionMessage = '';
+    let promotionIcon = '';
+    let promotionClass = '';
+    
+    if (stats.global.percentage >= 75) {
+        promotionMessage = "Amazing collection! You're a true Pokemon Master!";
+        promotionIcon = '🏆';
+        promotionClass = 'promotion-master';
+    } else if (stats.global.percentage >= 50) {
+        promotionMessage = "Wow! You're halfway to completing the Pokedex!";
+        promotionIcon = '🔥';
+        promotionClass = 'promotion-excellent';
+    } else if (stats.global.percentage >= 25) {
+        promotionMessage = "Great ! Amazing collection !";
+        promotionIcon = '⭐';
+        promotionClass = 'promotion-good';
+    } else if (stats.global.percentage >= 10) {
+        promotionMessage = "Nice ! Your collection is growing!";
+        promotionIcon = '🚀';
+        promotionClass = 'promotion-start';
+    } else {
+        promotionMessage = "Every collection starts somewhere!";
+        promotionIcon = '🌟';
+        promotionClass = 'promotion-beginner';
+    }
+    
     globalCard.innerHTML = `
         <h4>Global Statistics</h4>
         <div class="stat-item">
@@ -622,20 +694,69 @@ function displayStats(stats) {
                 </div>
             </div>
         </div>
+        <div class="pokebinderdex-promotion ${promotionClass}">
+            <div class="promotion-content">
+                <span class="promotion-icon">${promotionIcon}</span>
+                <span class="promotion-text">${promotionMessage}</span>
+            </div>
+            <a href="https://pokebinderdx.github.io/#solodex" target="_blank" class="promotion-link">
+                Explore SoloDex Collection →
+            </a>
+        </div>
     `;
     statsContainer.appendChild(globalCard);
 
-    // Generation statistics
+    // Generation statistics with targeted promotions
     const genCard = document.createElement('div');
     genCard.className = 'stat-card gen-stat';
     genCard.innerHTML = '<h4>Generation Statistics</h4>';
     
+    let hasGenerationData = false;
+    let bestGeneration = { name: '', percentage: 0, gen: '' };
+    
     Object.entries(stats.generations).forEach(([gen, data]) => {
         const genInfo = GENERATIONS[gen];
         if (data.count > 0) {
+            hasGenerationData = true;
+            
+            // Track best generation
+            if (data.percentage > bestGeneration.percentage) {
+                bestGeneration = { name: genInfo.name, percentage: data.percentage, gen: gen };
+            }
+            
             const genTotal = genInfo.max - genInfo.min + 1;
             const statItem = document.createElement('div');
             statItem.className = 'stat-item';
+            
+            // Add generation-specific promotion
+            let genPromotion = '';
+             if (data.percentage >= 80) {
+                genPromotion = `
+                    <div class="gen-promotion">
+                        <span class="gen-promo-text">INCREDIBLE ! You truly are the gen ${gen} expert!</span>
+                        <a href="https://pokebinderdx.github.io/#solodex" target="_blank" class="gen-promo-link">
+                            You at least deserves to get the best for your ${gen} collection
+                        </a>
+                    </div>
+                `;
+            } else if (data.percentage >= 40) {
+                genPromotion = `
+                    <div class="gen-promotion">
+                        <span class="gen-promo-text">🎯 ${gen} specialist!</span>
+                        <a href="https://pokebinderdx.github.io/#solodex" target="_blank" class="gen-promo-link">
+                            Display your love for ${gen}
+                        </a>
+                    </div>
+                `;
+            }
+            else if (data.percentage >= 15) {
+                genPromotion = `
+                    <div class="gen-promotion">
+                        <span class="gen-promo-text">📈 Awesome ${gen} collection!</span>
+                    </div>
+                `;
+            }
+            
             statItem.innerHTML = `
                 <span class="stat-label">${gen} (${genInfo.name})</span>
                 <div>
@@ -643,106 +764,233 @@ function displayStats(stats) {
                     <div class="stat-bar">
                         <div class="stat-bar-fill" style="width: ${Math.min(data.percentage, 100)}%"></div>
                     </div>
+                    ${genPromotion}
                 </div>
             `;
             genCard.appendChild(statItem);
         }
     });
     
-    if (Object.values(stats.generations).some(gen => gen.count > 0)) {
+    // Add overall generation promotion
+    if (hasGenerationData && bestGeneration.percentage > 0) {
+        const genOverallPromotion = document.createElement('div');
+        genOverallPromotion.className = 'generation-overall-promotion';
+        genOverallPromotion.innerHTML = `
+            <div class="promo-highlight">
+                🏅 Your strongest generation is <strong>${bestGeneration.gen}</strong> with ${bestGeneration.percentage.toFixed(1)}% completion!
+            </div>
+            <a href="https://pokebinderdx.github.io/#solodex" target="_blank" class="generation-promo-link">
+                Discover awesome ways to showcase it with SoloDex →
+            </a>
+        `;
+        genCard.appendChild(genOverallPromotion);
+    }
+    
+    if (hasGenerationData) {
         statsContainer.appendChild(genCard);
     }
 
-// Type statistics with detailed breakdown
-if (Object.keys(stats.types).length > 0) {
-    const typeCard = document.createElement('div');
-    typeCard.className = 'stat-card type-stat';
-    typeCard.innerHTML = '<h4>Type Statistics</h4>';
-    
-    // Créer la grille pour les types
-    const typeGrid = document.createElement('div');
-    typeGrid.className = 'type-stats-grid';
-    
-    Object.entries(stats.types)
-        .sort(([,a], [,b]) => b.count - a.count)
-        .forEach(([type, data]) => {
-            const typeStatItem = document.createElement('div');
-            typeStatItem.className = 'type-stat-item';
+    // Type statistics with promotions ET FOND COLORÉ
+    if (Object.keys(stats.types).length > 0) {
+        const typeCard = document.createElement('div');
+        typeCard.className = 'stat-card type-stat';
+        typeCard.innerHTML = '<h4>Type Statistics</h4>';
+        
+        // Find favorite type
+        let favoriteType = { name: '', count: 0, percentage: 0 };
+        Object.entries(stats.types).forEach(([type, data]) => {
+            if (data.count > favoriteType.count) {
+                favoriteType = { name: type, count: data.count, percentage: data.percentage };
+            }
+        });
+        
+        // Add type promotion header with colored background
+        if (favoriteType.count > 0) {
+            const typePromoHeader = document.createElement('div');
+            typePromoHeader.className = 'type-promotion-header';
             
-            // Calculate percentage of this type in total Pokedex
-            const totalOfThisType = getTotalPokemonOfType(type);
-            const globalTypePercentage = totalOfThisType > 0 ? (data.count / totalOfThisType) * 100 : 0;
+            // Obtenir la couleur du type favori
+            const typeColor = TYPE_COLORS[favoriteType.name] || '#A8A878';
+            const typeBgColor = TYPE_BACKGROUND_COLORS[favoriteType.name] || '#A8A87820';
             
-            typeStatItem.innerHTML = `
-                <div class="type-stat-header">
-                    <div class="type-label-with-icon">
-                        <img src="assets/types/${type.toLowerCase()}.png" class="type-icon" alt="${type}" onerror="this.style.display='none'">
-                        <span class="stat-label">${type}</span>
+            typePromoHeader.style.background = `linear-gradient(135deg, ${typeBgColor}, ${typeColor}15)`;
+            typePromoHeader.style.border = `2px solid ${typeColor}30`;
+            typePromoHeader.style.borderRadius = '12px';
+            typePromoHeader.style.padding = '15px';
+            typePromoHeader.style.marginBottom = '15px';
+            
+            typePromoHeader.innerHTML = `
+                <div class="favorite-type-highlight" style="color: ${typeColor};">
+                    <img src="assets/types/${favoriteType.name.toLowerCase()}.png" class="favorite-type-icon" alt="${favoriteType.name}" onerror="this.style.display='none'">
+                    <span style="font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">Your favorite type is ${favoriteType.name}!</span>
+                </div>
+                <a href="https://pokebinderdx.github.io/#solodex" target="_blank" class="type-analysis-link" 
+                   style="background: ${typeColor}; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-weight: bold; box-shadow: 0 2px 8px ${typeColor}40;">
+                    ${favoriteType.name} pokemons deserves great pdfs : SoloDex →
+                </a>
+            `;
+            typeCard.appendChild(typePromoHeader);
+        }
+        
+        // Créer la grille pour les types
+        const typeGrid = document.createElement('div');
+        typeGrid.className = 'type-stats-grid';
+        
+        Object.entries(stats.types)
+            .sort(([,a], [,b]) => b.count - a.count)
+            .forEach(([type, data]) => {
+                const typeStatItem = document.createElement('div');
+                typeStatItem.className = 'type-stat-item';
+                
+                // Obtenir la couleur pour ce type
+                const typeColor = TYPE_COLORS[type] || '#A8A878';
+                const typeBgColor = TYPE_BACKGROUND_COLORS[type] || '#A8A87820';
+                
+                // Appliquer la couleur de fond si c'est le type favori
+                if (type === favoriteType.name) {
+                    typeStatItem.style.background = `linear-gradient(135deg, ${typeBgColor}, ${typeColor}10)`;
+                    typeStatItem.style.border = `2px solid ${typeColor}50`;
+                }
+                
+                // Calculate percentage of this type in total Pokedex
+                const totalOfThisType = getTotalPokemonOfType(type);
+                const globalTypePercentage = totalOfThisType > 0 ? (data.count / totalOfThisType) * 100 : 0;
+                
+                typeStatItem.innerHTML = `
+                    <div class="type-stat-header">
+                        <div class="type-label-with-icon">
+                            <img src="assets/types/${type.toLowerCase()}.png" class="type-icon" alt="${type}" onerror="this.style.display='none'">
+                            <span class="stat-label" style="color: ${typeColor}; font-weight: bold;">${type}</span>
+                        </div>
+                        <span class="type-main-value" style="color: ${typeColor};">${data.count} (${data.percentage.toFixed(1)}%)</span>
                     </div>
-                    <span class="type-main-value">${data.count} (${data.percentage.toFixed(1)}%)</span>
-                </div>
-                <div class="type-stat-bar">
-                    <div class="type-stat-bar-fill" style="width: ${data.percentage}%"></div>
-                </div>
-                <div class="type-details-compact">
-                    <div class="type-global-stat">Global ${type}: ${globalTypePercentage.toFixed(1)}% (${data.count}/${totalOfThisType})</div>
-                    ${Object.entries(data.generationBreakdown)
-                        .filter(([, count]) => count > 0)
-                        .map(([gen, count]) => {
-                            const genTotalOfType = getTotalPokemonOfTypeInGeneration(type, gen);
-                            const genPercentage = genTotalOfType > 0 ? (count / genTotalOfType) * 100 : 0;
-                            return `<div class="type-breakdown-compact">
-                                <span>${gen}:</span>
-                                <span>${genPercentage.toFixed(1)}% (${count}/${genTotalOfType})</span>
-                            </div>`;
-                        }).join('')}
+                    <div class="type-stat-bar">
+                        <div class="type-stat-bar-fill" style="background: linear-gradient(90deg, ${typeColor}, ${typeColor}80); width: ${data.percentage}%"></div>
+                    </div>
+                    <div class="type-details-compact">
+                        <div class="type-global-stat">Global ${type}: ${globalTypePercentage.toFixed(1)}% (${data.count}/${totalOfThisType})</div>
+                        ${Object.entries(data.generationBreakdown)
+                            .filter(([, count]) => count > 0)
+                            .map(([gen, count]) => {
+                                const genTotalOfType = getTotalPokemonOfTypeInGeneration(type, gen);
+                                const genPercentage = genTotalOfType > 0 ? (count / genTotalOfType) * 100 : 0;
+                                return `<div class="type-breakdown-compact">
+                                    <span>${gen}:</span>
+                                    <span>${genPercentage.toFixed(1)}% (${count}/${genTotalOfType})</span>
+                                </div>`;
+                            }).join('')}
+                    </div>
+                `;
+                typeGrid.appendChild(typeStatItem);
+            });
+        
+        typeCard.appendChild(typeGrid);
+        statsContainer.appendChild(typeCard);
+    }
+
+    // Rest of the function remains the same...
+    // Special statistics with promotions
+    if (stats.legendary.count > 0 || stats.starter.count > 0) {
+        const specialCard = document.createElement('div');
+        specialCard.className = 'stat-card special-stat';
+        specialCard.innerHTML = '<h4>Special Statistics</h4>';
+        
+        if (stats.legendary.count > 0) {
+            const legendaryItem = document.createElement('div');
+            legendaryItem.className = 'stat-item';
+            
+            let legendaryPromo = '';
+            if (stats.legendary.percentage >= 50) {
+                legendaryPromo = `
+                    <div class="special-promotion legendary-master">
+                        ✨ Legendary Master! You've caught ${stats.legendary.count} legendary Pokemon!
+                        <a href="https://pokebinderdx.github.io/#solodex" target="_blank" class="special-promo-link">
+                            Show off your legendary collection →
+                        </a>
+                    </div>
+                `;
+            } else if (stats.legendary.count >= 10) {
+                legendaryPromo = `
+                    <div class="special-promotion legendary-hunter">
+                        🔮 Legendary Hunter! Keep seeking those rare Pokemon!
+                    </div>
+                `;
+            }
+            
+            legendaryItem.innerHTML = `
+                <span class="stat-label">Legendary Pokemon</span>
+                <div>
+                    <span class="stat-value">${stats.legendary.count}/${LEGENDARY_POKEMON.size} (${stats.legendary.percentage.toFixed(1)}%)</span>
+                    <div class="stat-bar">
+                        <div class="stat-bar-fill" style="width: ${Math.min(stats.legendary.percentage, 100)}%"></div>
+                    </div>
+                    ${legendaryPromo}
                 </div>
             `;
-            typeGrid.appendChild(typeStatItem);
-        });
-    
-    typeCard.appendChild(typeGrid);
-    statsContainer.appendChild(typeCard);
-}
-
-    // Special statistics
-    const specialCard = document.createElement('div');
-    specialCard.className = 'stat-card';
-    specialCard.innerHTML = '<h4>Special Statistics</h4>';
-    
-    if (stats.legendary.count > 0) {
-        const legendaryItem = document.createElement('div');
-        legendaryItem.className = 'stat-item';
-        legendaryItem.innerHTML = `
-            <span class="stat-label">Legendary Pokemon</span>
-            <div>
-                <span class="stat-value">${stats.legendary.count}/${LEGENDARY_POKEMON.size} (${stats.legendary.percentage.toFixed(1)}%)</span>
-                <div class="stat-bar">
-                    <div class="stat-bar-fill" style="width: ${Math.min(stats.legendary.percentage, 100)}%"></div>
+            specialCard.appendChild(legendaryItem);
+        }
+        
+        if (stats.starter.count > 0) {
+            const starterItem = document.createElement('div');
+            starterItem.className = 'stat-item';
+            
+            let starterPromo = '';
+            if (stats.starter.percentage >= 75) {
+                starterPromo = `
+                    <div class="special-promotion starter-master">
+                        🌟 Starter Collector! You have most starter Pokemon!
+                        <a href="https://pokebinderdx.github.io/#solodex" target="_blank" class="special-promo-link">
+                            Organize your collection →
+                        </a>
+                    </div>
+                `;
+            } else if (stats.starter.count >= 5) {
+                starterPromo = `
+                    <div class="special-promotion starter-fan">
+                        🔥 Starter enthusiast! Great starter collection!
+                    </div>
+                `;
+            }
+            
+            starterItem.innerHTML = `
+                <span class="stat-label">Starter Pokemon</span>
+                <div>
+                    <span class="stat-value">${stats.starter.count}/${STARTER_POKEMON.size} (${stats.starter.percentage.toFixed(1)}%)</span>
+                    <div class="stat-bar">
+                        <div class="stat-bar-fill" style="width: ${Math.min(stats.starter.percentage, 100)}%"></div>
+                    </div>
+                    ${starterPromo}
                 </div>
-            </div>
-        `;
-        specialCard.appendChild(legendaryItem);
-    }
-    
-    if (stats.starter.count > 0) {
-        const starterItem = document.createElement('div');
-        starterItem.className = 'stat-item';
-        starterItem.innerHTML = `
-            <span class="stat-label">Starter Pokemon</span>
-            <div>
-                <span class="stat-value">${stats.starter.count}/${STARTER_POKEMON.size} (${stats.starter.percentage.toFixed(1)}%)</span>
-                <div class="stat-bar">
-                    <div class="stat-bar-fill" style="width: ${Math.min(stats.starter.percentage, 100)}%"></div>
-                </div>
-            </div>
-        `;
-        specialCard.appendChild(starterItem);
-    }
-    
-    if (stats.legendary.count > 0 || stats.starter.count > 0) {
+            `;
+            specialCard.appendChild(starterItem);
+        }
+        
         statsContainer.appendChild(specialCard);
     }
+    
+    // Add final call-to-action card
+    const ctaCard = document.createElement('div');
+    ctaCard.className = 'stat-card cta-card';
+    ctaCard.innerHTML = `
+        <div class="cta-content">
+            <div class="cta-header">
+                <span class="cta-icon">🎯</span>
+                <h4>Ready to level up your collection?</h4>
+            </div>
+            <p class="cta-description">
+                Discover great ways to organize your collection !
+            </p>
+            <div class="cta-buttons">
+                <a href="https://pokebinderdx.github.io/#solodex" target="_blank" class="cta-primary">
+                    🔍 Explore SoloDex Collection
+                </a>
+                <a href="https://pokebinderdx.github.io" target="_blank" class="cta-secondary">
+                    📊 PokeBinderDex Hub
+                </a>
+            </div>
+        </div>
+    `;
+    statsContainer.appendChild(ctaCard);
     
     resultsList.appendChild(statsContainer);
 }
@@ -1124,3 +1372,46 @@ async function generatePDFChecklist(detectedPokemon, language) {
         }, 3000);
     }
 }
+
+
+// Add this to your existing scanner.js file
+
+// Compact tutorial toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const tutorialToggleHeader = document.getElementById('tutorialToggleHeader');
+    const tutorialContent = document.getElementById('tutorialContent');
+    const tutorialArrow = document.getElementById('tutorialArrow');
+    const tutorialCompact = document.querySelector('.tutorial-compact');
+    
+    if (tutorialToggleHeader && tutorialContent && tutorialArrow) {
+        tutorialToggleHeader.addEventListener('click', function() {
+            const isExpanded = tutorialContent.classList.contains('expanded');
+            
+            if (isExpanded) {
+                // Collapse
+                tutorialContent.classList.remove('expanded');
+                tutorialCompact.classList.remove('expanded');
+
+            } else {
+                // Expand
+                tutorialContent.classList.add('expanded');
+                tutorialCompact.classList.add('expanded');
+      
+            }
+        });
+    }
+    
+    // Optional: Auto-collapse tutorial after successful scan
+    window.autoCollapseTutorial = function() {
+        if (tutorialContent && tutorialContent.classList.contains('expanded')) {
+            setTimeout(() => {
+                tutorialToggleHeader.click();
+            }, 3000); // Auto-collapse after 3 seconds
+        }
+    };
+});
+
+// Call this function at the end of your successful scan to auto-collapse tutorial:
+// if (typeof autoCollapseTutorial === 'function') {
+//     autoCollapseTutorial();
+// }
