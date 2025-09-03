@@ -1756,3 +1756,168 @@ footer {
     display: inline-block; /* nécessaire pour rotate */
     transform: rotate(20deg);
 }
+
+
+
+/* Scanner Beta Button - Version Responsive Améliorée */
+.scanner-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: linear-gradient(135deg, #ff7070, #ffd5d5);
+  color: white;
+  font-weight: bold;
+  padding: 8px 14px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+  white-space: nowrap;
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.scanner-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+  text-decoration: none;
+  color: white;
+}
+
+/* Petit tag Beta */
+.beta-tag {
+  background: #fe6d6d;
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 8px;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+/* Media Queries pour la responsivité */
+
+/* Écrans moyens et petits (tablettes) */
+@media (max-width: 1200px) {
+  .scanner-btn {
+    top: 12px;
+    right: 15px;
+    padding: 7px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .beta-tag {
+    font-size: 0.65rem;
+    padding: 2px 5px;
+  }
+}
+
+/* Tablettes en mode portrait */
+@media (max-width: 992px) {
+  .scanner-btn {
+    top: 10px;
+    right: 15px;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    border-radius: 18px;
+  }
+  
+  .beta-tag {
+    font-size: 0.6rem;
+    padding: 1px 4px;
+  }
+}
+
+/* Smartphones et petits écrans */
+@media (max-width: 768px) {
+  .scanner-btn {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    border-radius: 16px;
+    z-index: 9999;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  
+  .beta-tag {
+    font-size: 0.55rem;
+    padding: 1px 3px;
+    border-radius: 6px;
+  }
+}
+
+/* Très petits écrans */
+@media (max-width: 480px) {
+  .scanner-btn {
+    top: 8px;
+    right: 8px;
+    padding: 5px 8px;
+    font-size: 0.75rem;
+    border-radius: 14px;
+  }
+  
+
+  .beta-tag {
+    font-size: 0.5rem;
+    padding: 1px 2px;
+  }
+}
+
+/* Version alternative pour très petits écrans - bouton compact */
+@media (max-width: 320px) {
+  .scanner-btn {
+    top: 5px;
+    right: 5px;
+    padding: 4px 6px;
+    font-size: 0.7rem;
+    border-radius: 12px;
+    min-width: 40px;
+    text-align: center;
+  }
+
+    /* Option : cacher le texte et ne garder qu'une icône sur très petits écrans */
+  .scanner-btn .scanner-text {
+    display: none;
+  }
+  
+  /* Ajout d'une icône si vous voulez remplacer le texte */
+  .scanner-btn::before {
+    content: "🔍";
+    font-size: 1rem;
+  }
+  
+}
+
+/* Gestion du header container pour éviter les conflits */
+@media (max-width: 768px) {
+  .header-container {
+    position: relative;
+    padding-top: 50px; /* Espace pour le bouton scanner en position fixed */
+  }
+}
+
+/* Animation d'attention pour mobile */
+@media (max-width: 768px) {
+  .scanner-btn {
+    animation: pulseAttention 3s infinite ease-in-out;
+  }
+  
+  @keyframes pulseAttention {
+    0%, 100% { 
+      transform: scale(1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    50% { 
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(255, 112, 112, 0.4);
+    }
+  }
+  
+  .scanner-btn:hover {
+    animation: none; /* Arrête l'animation au hover */
+  }
+}
