@@ -301,7 +301,7 @@ window.clearQueue = function() {
 
 // Mettre à jour l'affichage de la file d'attente
 function updateQueueDisplay() {
-    queueCount.textContent = `${imageQueue.length} image(s) en attente`;
+    queueCount.textContent = `${imageQueue.length} image(s) waiting`;
     
     if (imageQueue.length > 0) {
         imageQueueDiv.classList.add('show');
