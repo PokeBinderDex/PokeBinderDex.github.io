@@ -1418,17 +1418,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
+// =======================================================================================
+// PROPELLERADS SIMPLE - JUSTE UNE PUB QUI MARCHE
+// =======================================================================================
 
-
-
-
+/*
+ÉTAPES RAPIDES :
+1. Aller sur https://propellerads.com/
+2. Créer un compte
+3. Ajouter votre site dans "Websites" 
+4. Créer une zone "Interstitial"
+5. Copier le ZONE_ID
+6. Le coller ci-dessous à la place de "VOTRE_ZONE_ID"
+7. C'est tout !
+*/
 
 // =======================================================================================
 // CONFIGURATION
 // =======================================================================================
 
 const PROPELLER_CONFIG = {
-    ZONE_ID: "9871908", // Remplacer par votre vraie zone ID
+    ZONE_ID: "VOTRE_ZONE_ID", // Remplacer par votre vraie zone ID
     TIMER_SECONDS: 30 // 30 secondes minimum
 };
 
@@ -1719,13 +1729,32 @@ function testAd() {
     showAd();
 }
 
+//
+// FONCTIONS UTILITAIRES
+//
+
+function skipToMainSite() {
+    console.log("🏠 Redirection vers le site principal");
+    window.location.href = 'https://pokebinderdex.github.io';
+}
+
 // Debug dans la console
 window.adDebug = {
     show: showAd,
     close: closeAd,
-    test: testAd
+    test: testAd,
+    skip: skipToMainSite,
+    reload: () => { loadPropellerAds(); },
+    checkStatus: () => {
+        console.log("Status PropellerAds:");
+        console.log("- window.PropellerAds:", typeof window.PropellerAds);
+        console.log("- propellerAdLoaded:", window.propellerAdLoaded);
+        console.log("- pubActive:", pubActive);
+    }
 };
 
 console.log("🎯 Système pub simple chargé - Tapez adDebug.show() pour tester");
 
-
+// =======================================================================================
+// INTÉGRATION AVEC VOTRE SCANNER POKEMON
+// =======================================================================================
