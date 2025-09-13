@@ -1418,176 +1418,71 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
+// =======================================================================================
+// PROPELLERADS SIMPLE - JUSTE UNE PUB QUI MARCHE
+// =======================================================================================
 
 
-
-
+// =======================================================================================
+// CONFIGURATION
+// =======================================================================================
 
 const PROPELLER_CONFIG = {
-    ZONE_ID: "9871908", 
-    VIDEO_DURATION: 120, // 2 minutes obligatoires
-    FORCE_COMPLETION: true, // Pas de skip
-    AD_TYPE: "interstitial_video", // Type le plus rémunérateur
-    AUTO_CLOSE: false // L'utilisateur ne peut pas fermer
+    ZONE_ID: "9871908", // Remplacer par votre vraie zone ID
+    TIMER_SECONDS: 30 // 30 secondes minimum
 };
 
-// Revenus estimés PropellerAds (plus élevés)
-const PROPELLER_REVENUE_ESTIMATES = {
-    interstitialVideo: 0.35, // 0.35€ par vidéo vue complètement
-    popunder: 0.15, // 0.15€ par popunder
-    push: 0.08, // 0.08€ par notification push
-    bonus: 0.10 // Bonus si multiple interactions
-};
-
-// Variables globales
-let propellerAdActive = false;
-let propellerAdLoaded = false;
-let adWatchTime = 0;
-let totalEarnings = 0;
-let adTimer = null;
-let scanComplete = false;
+let pubActive = false;
+let timeLeft = 0;
+let timerInterval = null;
 
 // =======================================================================================
-// ÉTAPE 1: INITIALISATION PROPELLERADS (SIMPLE)
+// SCRIPT PROPELLERADS
 // =======================================================================================
 
-function initializePropellerAds() {
-    // Script PropellerAds principal
+function loadPropellerAds() {
+    if (document.querySelector('#propeller-script')) return;
+    
     const script = document.createElement('script');
+    script.id = 'propeller-script';
     script.src = 'https://iclickcdn.com/tag.min.js';
     script.setAttribute('data-zone', PROPELLER_CONFIG.ZONE_ID);
     script.async = true;
     
     script.onload = function() {
-        console.log("PropellerAds initialisé avec succès");
-        propellerAdLoaded = true;
-        
-        // Configuration des callbacks PropellerAds
-        window.propellerCallbacks = {
-            onInterstitialShow: function() {
-                console.log("Vidéo interstitielle affichée");
-                trackPropellerImpression();
-            },
-            onInterstitialClose: function() {
-                console.log("Vidéo interstitielle fermée");
-                handlePropellerClose();
-            },
-            onInterstitialClick: function() {
-                console.log("Clic sur vidéo interstitielle");
-                trackPropellerClick();
-            }
-        };
-    };
-    
-    script.onerror = function() {
-        console.warn("Échec chargement PropellerAds, utilisation fallback");
-        loadFallbackVideoAd();
+        console.log("PropellerAds chargé");
     };
     
     document.head.appendChild(script);
 }
 
 // =======================================================================================
-// ÉTAPE 2: CRÉATION OVERLAY PERSONNALISÉ PROPELLERADS
+// OVERLAY SIMPLE
 // =======================================================================================
 
-function createPropellerOverlay() {
+function createSimpleOverlay() {
     const overlay = document.createElement('div');
-    overlay.id = 'propellerAdOverlay';
-    overlay.className = 'propeller-overlay';
+    overlay.id = 'simple-ad-overlay';
     
     overlay.innerHTML = `
-        <div class="propeller-container">
-            <div class="propeller-header">
-                <div class="brand-section">
-                    <h3>🧠 IA Premium en analyse...</h3>
-                    <p>Analyse approfondie de votre collection Pokemon</p>
-                </div>
-                <div class="timer-section">
-                    <div class="circular-timer">
-                        <svg class="timer-ring" width="80" height="80">
-                            <circle cx="40" cy="40" r="35" fill="transparent" stroke="#e0e0e0" stroke-width="6"/>
-                            <circle id="timerProgress" cx="40" cy="40" r="35" fill="transparent" 
-                                    stroke="#ff6b6b" stroke-width="6" stroke-linecap="round"
-                                    style="stroke-dasharray: 220; stroke-dashoffset: 220;"/>
-                        </svg>
-                        <div class="timer-text">
-                            <span id="timeRemaining">120</span>
-                            <small>sec</small>
-                        </div>
-                    </div>
+        <div class="ad-container">
+            <div class="ad-header">
+                <h3>🎯 Analyse en cours...</h3>
+                <div class="timer">
+                    <span id="countdown">${PROPELLER_CONFIG.TIMER_SECONDS}</span>s
                 </div>
             </div>
-
-            <!-- Zone vidéo PropellerAds + fallback -->
-            <div class="video-zone">
-                <!-- Zone PropellerAds (invisible au début) -->
-                <div id="propeller-ad-zone" class="ad-zone-hidden">
-                    <!-- PropellerAds s'injecte ici -->
-                </div>
-                
-                <!-- Overlay visuel pendant l'attente -->
-                <div id="propeller-loading" class="propeller-loading">
-                    <div class="video-placeholder">
-                        <div class="play-icon">▶</div>
-                        <div class="loading-text">Chargement de la vidéo premium...</div>
-                        <div class="dots-loader">
-                            <span></span><span></span><span></span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Fallback vidéo si PropellerAds échoue -->
-                <div id="fallback-video-zone" class="fallback-zone" style="display: none;">
-                    <video id="fallbackVideo" width="100%" height="100%" autoplay muted loop>
-                        <source src="assets/ads/premium-pokemon.mp4" type="video/mp4">
-                        <source src="assets/ads/collection-storage.mp4" type="video/mp4">
-                    </video>
-                    <div class="fallback-overlay">
-                        <h4>Découvrez les produits Pokemon premium</h4>
-                        <p>Accessoires professionnels pour collectionneurs exigeants</p>
-                        <div class="fallback-cta">
-                            <a href="https://lien-affiliation-premium.com" target="_blank" 
-                               onclick="trackFallbackClick()" class="cta-button">
-                                Voir la collection premium →
-                            </a>
-                        </div>
-                    </div>
+            
+            <div class="ad-zone" id="propeller-ad-zone">
+                <!-- PropellerAds s'affiche ici -->
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Chargement de la publicité...</p>
                 </div>
             </div>
-
-            <!-- Progression du scan -->
-            <div class="scan-status">
-                <div class="scan-title">Analyse IA Multi-Phase</div>
-                <div class="scan-phases">
-                    <div class="phase active" id="phase1">
-                        <div class="phase-dot"></div>
-                        <span>Extraction données</span>
-                    </div>
-                    <div class="phase" id="phase2">
-                        <div class="phase-dot"></div>
-                        <span>Reconnaissance IA</span>
-                    </div>
-                    <div class="phase" id="phase3">
-                        <div class="phase-dot"></div>
-                        <span>Analyse statistique</span>
-                    </div>
-                    <div class="phase" id="phase4">
-                        <div class="phase-dot"></div>
-                        <span>Rapport final</span>
-                    </div>
-                </div>
-                <div class="scan-progress-bar">
-                    <div class="scan-progress-fill" id="scanProgress"></div>
-                </div>
-            </div>
-
-            <!-- Footer info -->
-            <div class="propeller-footer">
-                <div class="revenue-info">
-                    <span class="revenue-badge">💰 Cette pub finance votre analyse gratuite</span>
-                    <span class="no-skip">⏱ Visionnage requis - Pas de raccourci possible</span>
-                </div>
+            
+            <div class="ad-footer">
+                <p>Cette publicité finance votre scan gratuit</p>
             </div>
         </div>
     `;
@@ -1596,622 +1491,239 @@ function createPropellerOverlay() {
 }
 
 // =======================================================================================
-// ÉTAPE 3: STYLES CSS OPTIMISÉS PROPELLERADS
+// STYLES CSS PROPRES
 // =======================================================================================
 
-function injectPropellerStyles() {
+function addStyles() {
+    if (document.querySelector('#simple-ad-styles')) return;
+    
     const styles = `
-        .propeller-overlay {
+        #simple-ad-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(26,32,44,0.98) 100%);
+            background: rgba(0, 0, 0, 0.9);
             z-index: 999999;
             display: flex;
             align-items: center;
             justify-content: center;
-            user-select: none;
-            -webkit-user-select: none;
         }
 
-        .propeller-container {
-            background: linear-gradient(145deg, #ffffff 0%, #f7fafc 100%);
-            border-radius: 20px;
-            width: 90vw;
-            max-width: 900px;
-            height: 85vh;
-            max-height: 650px;
-            padding: 25px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
-            display: flex;
-            flex-direction: column;
-            border: 2px solid rgba(255,255,255,0.1);
-        }
-
-        .propeller-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #e2e8f0;
-            margin-bottom: 25px;
-        }
-
-        .brand-section h3 {
-            color: #2d3748;
-            font-size: 1.6em;
-            margin-bottom: 8px;
-            font-weight: 700;
-        }
-
-        .brand-section p {
-            color: #4a5568;
-            font-size: 1em;
-            margin: 0;
-        }
-
-        .timer-section {
-            position: relative;
-        }
-
-        .circular-timer {
-            position: relative;
-            width: 80px;
-            height: 80px;
-        }
-
-        .timer-ring {
-            transform: rotate(-90deg);
-            transition: stroke-dashoffset 1s ease;
-        }
-
-        .timer-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            color: #2d3748;
-            font-weight: bold;
-        }
-
-        .timer-text span {
-            font-size: 1.5em;
-            display: block;
-        }
-
-        .timer-text small {
-            font-size: 0.8em;
-            opacity: 0.7;
-        }
-
-        .video-zone {
-            flex: 1;
-            background: #000;
+        .ad-container {
+            background: white;
             border-radius: 15px;
-            position: relative;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
             overflow: hidden;
-            margin-bottom: 25px;
-            min-height: 300px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        .propeller-loading {
-            width: 100%;
-            height: 100%;
+        .ad-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #1a202c, #2d3748);
-        }
-
-        .video-placeholder {
-            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
 
-        .play-icon {
-            font-size: 4em;
-            margin-bottom: 20px;
-            color: #ff6b6b;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(1.1); }
-        }
-
-        .loading-text {
+        .ad-header h3 {
+            margin: 0;
             font-size: 1.2em;
-            margin-bottom: 20px;
-            font-weight: 600;
         }
 
-        .dots-loader {
+        .timer {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .ad-zone {
+            min-height: 300px;
+            background: #f5f5f5;
             display: flex;
+            align-items: center;
             justify-content: center;
-            gap: 8px;
-        }
-
-        .dots-loader span {
-            width: 8px;
-            height: 8px;
-            background: #ff6b6b;
-            border-radius: 50%;
-            animation: dotBounce 1.4s infinite ease-in-out both;
-        }
-
-        .dots-loader span:nth-child(1) { animation-delay: -0.32s; }
-        .dots-loader span:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes dotBounce {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
-        }
-
-        .fallback-zone {
-            width: 100%;
-            height: 100%;
             position: relative;
         }
 
-        .fallback-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(transparent, rgba(0,0,0,0.8));
-            color: white;
-            padding: 25px;
+        .loading {
             text-align: center;
+            color: #666;
         }
 
-        .cta-button {
-            background: linear-gradient(135deg, #ff6b6b, #feca57);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: bold;
-            display: inline-block;
-            margin-top: 15px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255,107,107,0.3);
-        }
-
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255,107,107,0.4);
-            color: white;
-            text-decoration: none;
-        }
-
-        .scan-status {
-            margin-bottom: 20px;
-        }
-
-        .scan-title {
-            text-align: center;
-            font-size: 1.1em;
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 15px;
-        }
-
-        .scan-phases {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-        }
-
-        .phase {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex: 1;
-            opacity: 0.4;
-            transition: opacity 0.3s ease;
-        }
-
-        .phase.active {
-            opacity: 1;
-        }
-
-        .phase-dot {
-            width: 12px;
-            height: 12px;
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e3e3e3;
+            border-top: 4px solid #667eea;
             border-radius: 50%;
-            background: #e2e8f0;
-            margin-bottom: 8px;
-            transition: background 0.3s ease;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
         }
 
-        .phase.active .phase-dot {
-            background: linear-gradient(135deg, #ff6b6b, #feca57);
-            animation: pulse 2s infinite;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        .phase span {
-            font-size: 0.85em;
+        .ad-footer {
+            padding: 15px 20px;
             text-align: center;
-            color: #4a5568;
-            font-weight: 500;
-        }
-
-        .scan-progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #e2e8f0;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .scan-progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ff6b6b, #feca57);
-            width: 0%;
-            transition: width 0.5s ease;
-            border-radius: 4px;
-        }
-
-        .propeller-footer {
-            text-align: center;
-            padding-top: 15px;
-            border-top: 2px solid #e2e8f0;
-        }
-
-        .revenue-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .revenue-badge {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: 600;
-        }
-
-        .no-skip {
-            color: #e53e3e;
-            font-weight: bold;
+            background: #f9f9f9;
+            border-top: 1px solid #eee;
+            color: #666;
             font-size: 0.9em;
         }
 
-        /* Responsive */
+        /* Mobile */
         @media (max-width: 768px) {
-            .propeller-container {
-                width: 95vw;
-                height: 90vh;
-                padding: 20px;
+            .ad-container {
+                width: 95%;
+                height: 70vh;
             }
-            
-            .propeller-header {
-                flex-direction: column;
-                gap: 15px;
-                text-align: center;
-            }
-            
-            .scan-phases {
-                flex-wrap: wrap;
-                gap: 15px;
-            }
-            
-            .revenue-info {
-                flex-direction: column;
-                gap: 10px;
-            }
-        }
-
-        /* Désactiver sélection et menu contextuel */
-        .propeller-overlay * {
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-touch-callout: none;
         }
     `;
     
-    if (!document.querySelector('#propeller-styles')) {
-        const styleElement = document.createElement('style');
-        styleElement.id = 'propeller-styles';
-        styleElement.textContent = styles;
-        document.head.appendChild(styleElement);
-    }
+    const styleSheet = document.createElement('style');
+    styleSheet.id = 'simple-ad-styles';
+    styleSheet.textContent = styles;
+    document.head.appendChild(styleSheet);
 }
 
 // =======================================================================================
-// ÉTAPE 4: GESTION DU TIMING FORCÉ
+// TIMER SIMPLE
 // =======================================================================================
 
-function startPropellerTimer() {
-    let timeRemaining = PROPELLER_CONFIG.VIDEO_DURATION;
-    let phaseIndex = 0;
-    const phases = ['phase1', 'phase2', 'phase3', 'phase4'];
+function startTimer() {
+    timeLeft = PROPELLER_CONFIG.TIMER_SECONDS;
     
-    adTimer = setInterval(() => {
-        timeRemaining--;
-        adWatchTime++;
+    timerInterval = setInterval(() => {
+        timeLeft--;
         
-        // Mise à jour affichage timer
-        const timerElement = document.getElementById('timeRemaining');
-        if (timerElement) {
-            timerElement.textContent = timeRemaining;
+        const countdown = document.getElementById('countdown');
+        if (countdown) {
+            countdown.textContent = timeLeft;
         }
         
-        // Animation cercle de progression
-        const progressCircle = document.getElementById('timerProgress');
-        if (progressCircle) {
-            const progress = (adWatchTime / PROPELLER_CONFIG.VIDEO_DURATION) * 220;
-            progressCircle.style.strokeDashoffset = 220 - progress;
-        }
-        
-        // Mise à jour phases
-        const currentPhase = Math.floor((adWatchTime / PROPELLER_CONFIG.VIDEO_DURATION) * phases.length);
-        if (currentPhase > phaseIndex && currentPhase < phases.length) {
-            document.getElementById(phases[phaseIndex])?.classList.remove('active');
-            document.getElementById(phases[currentPhase])?.classList.add('active');
-            phaseIndex = currentPhase;
-        }
-        
-        // Mise à jour barre de progression
-        const progressBar = document.getElementById('scanProgress');
-        if (progressBar) {
-            const progress = Math.min((adWatchTime / PROPELLER_CONFIG.VIDEO_DURATION) * 100, 100);
-            progressBar.style.width = `${progress}%`;
-        }
-        
-        // Vérifier conditions de fermeture
-        if (timeRemaining <= 0 || (scanComplete && adWatchTime >= 90)) {
-            clearInterval(adTimer);
-            
-            // Calcul revenus basé sur temps de visionnage
-            const completionRate = adWatchTime / PROPELLER_CONFIG.VIDEO_DURATION;
-            const earnings = PROPELLER_REVENUE_ESTIMATES.interstitialVideo * completionRate;
-            totalEarnings += earnings;
-            
-            console.log(`PropellerAds: ${completionRate * 100}% vue - Gains: €${earnings.toFixed(3)}`);
-            
-            setTimeout(hidePropellerAd, 2000);
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            closeAd();
         }
     }, 1000);
 }
 
 // =======================================================================================
-// ÉTAPE 5: CHARGEMENT PROPELLERADS + FALLBACK
+// FONCTIONS PRINCIPALES
 // =======================================================================================
 
-function triggerPropellerAd() {
-    // Attendre que le script soit chargé
-    if (!propellerAdLoaded) {
-        setTimeout(triggerPropellerAd, 1000);
-        return;
-    }
+function showAd() {
+    if (pubActive) return;
     
-    try {
-        // Déclencher la publicité PropellerAds
-        if (window.PropellerAds) {
-            window.PropellerAds.show({
-                zoneId: PROPELLER_CONFIG.ZONE_ID,
-                type: 'interstitial'
-            });
-            
-            console.log("PropellerAds interstitielle déclenchée");
-            
-            // Masquer le loading et montrer la zone PropellerAds
-            setTimeout(() => {
-                const loading = document.getElementById('propeller-loading');
-                if (loading) loading.style.display = 'none';
-            }, 3000);
-            
-        } else {
-            throw new Error("PropellerAds non disponible");
-        }
-    } catch (error) {
-        console.warn("Erreur PropellerAds, utilisation fallback:", error);
-        loadFallbackVideoAd();
-    }
-}
-
-function loadFallbackVideoAd() {
-    const loading = document.getElementById('propeller-loading');
-    const fallback = document.getElementById('fallback-video-zone');
-    const video = document.getElementById('fallbackVideo');
+    console.log("Affichage publicité");
+    pubActive = true;
     
-    if (loading) loading.style.display = 'none';
-    if (fallback) {
-        fallback.style.display = 'block';
-        console.log("Fallback vidéo locale activé");
-        
-        if (video) {
-            video.play().catch(() => {
-                console.log("Autoplay bloqué, interaction requise");
-            });
-        }
-    }
-}
-
-// =======================================================================================
-// ÉTAPE 6: FONCTIONS DE TRACKING
-// =======================================================================================
-
-function trackPropellerImpression() {
-    console.log("Impression PropellerAds trackée");
-    
-    // Google Analytics si disponible
-    if (typeof gtag !== 'undefined') {
-        gtag('event', 'propeller_impression', {
-            'event_category': 'monetization',
-            'event_label': 'pokemon_scanner',
-            'value': 1
-        });
-    }
-}
-
-function trackPropellerClick() {
-    const clickRevenue = PROPELLER_REVENUE_ESTIMATES.interstitialVideo * 1.5; // Bonus clic
-    totalEarnings += clickRevenue;
-    
-    console.log(`Clic PropellerAds - Bonus: €${clickRevenue.toFixed(3)}`);
-    
-    if (typeof gtag !== 'undefined') {
-        gtag('event', 'propeller_click', {
-            'event_category': 'monetization',
-            'event_label': 'pokemon_scanner',
-            'value': clickRevenue
-        });
-    }
-}
-
-function trackFallbackClick() {
-    const affiliateRevenue = PROPELLER_REVENUE_ESTIMATES.popunder;
-    totalEarnings += affiliateRevenue;
-    
-    console.log(`Clic affiliation fallback: €${affiliateRevenue.toFixed(3)}`);
-}
-
-function handlePropellerClose() {
-    // Ne pas fermer immédiatement, forcer le timing minimum
-    console.log("Tentative fermeture PropellerAds - maintien forcé");
-}
-
-// =======================================================================================
-// ÉTAPE 7: FONCTIONS PRINCIPALES
-// =======================================================================================
-
-function showPropellerAd() {
-    if (propellerAdActive) return;
-    
-    console.log("Affichage publicité PropellerAds...");
-    propellerAdActive = true;
-    scanComplete = false;
-    adWatchTime = 0;
-    
-    // Injection styles et création interface
-    injectPropellerStyles();
-    const overlay = createPropellerOverlay();
+    // Ajouter styles et overlay
+    addStyles();
+    const overlay = createSimpleOverlay();
     document.body.appendChild(overlay);
+    
+    // Bloquer le scroll
     document.body.style.overflow = 'hidden';
     
-    // Désactiver raccourcis clavier
-    document.addEventListener('keydown', preventEscape, {capture: true});
-    document.addEventListener('contextmenu', preventRightClick, {capture: true});
-    
     // Démarrer timer
-    startPropellerTimer();
+    startTimer();
     
-    // Déclencher la pub PropellerAds
-    setTimeout(triggerPropellerAd, 2000);
+    // Déclencher PropellerAds après 2 secondes
+    setTimeout(() => {
+        triggerPropellerAd();
+    }, 2000);
 }
 
-function hidePropellerAd() {
-    const overlay = document.getElementById('propellerAdOverlay');
+function closeAd() {
+    const overlay = document.getElementById('simple-ad-overlay');
     if (overlay) {
         overlay.remove();
     }
     
     document.body.style.overflow = '';
-    document.removeEventListener('keydown', preventEscape, {capture: true});
-    document.removeEventListener('contextmenu', preventRightClick, {capture: true});
+    pubActive = false;
     
-    propellerAdActive = false;
+    if (timerInterval) {
+        clearInterval(timerInterval);
+    }
     
-    console.log(`Session PropellerAds terminée - Total gagné: €${totalEarnings.toFixed(3)}`);
+    console.log("Publicité fermée");
 }
 
-function preventEscape(e) {
-    // Bloquer Esc, F5, Ctrl+R, Alt+F4
-    const blocked = [27, 116, 123];
-    if (blocked.includes(e.keyCode) || 
-        (e.ctrlKey && e.keyCode === 82) || 
-        (e.altKey && e.keyCode === 115)) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
+function triggerPropellerAd() {
+    // Essayer de déclencher PropellerAds
+    try {
+        if (typeof window.PropellerAds !== 'undefined') {
+            // Remplacer le contenu loading par la vraie pub
+            const adZone = document.getElementById('propeller-ad-zone');
+            if (adZone) {
+                adZone.innerHTML = '<div id="propeller-target"></div>';
+            }
+            
+            // Déclencher PropellerAds
+            window.PropellerAds.show({
+                zoneId: PROPELLER_CONFIG.ZONE_ID,
+                target: 'propeller-target'
+            });
+            
+            console.log("PropellerAds déclenché");
+        } else {
+            console.log("PropellerAds pas encore chargé");
+        }
+    } catch (error) {
+        console.warn("Erreur PropellerAds:", error);
+        // Garder juste le loading si ça marche pas
     }
 }
 
-function preventRightClick(e) {
-    e.preventDefault();
-    return false;
-}
-
 // =======================================================================================
-// ÉTAPE 8: INTÉGRATION AVEC VOTRE SCANNER EXISTANT
+// INTÉGRATION
 // =======================================================================================
 
-// Sauvegarder votre fonction originale
-const originalProcessAllImages = processAllImages;
-
-// Nouvelle fonction avec PropellerAds intégré
-async function processAllImages() {
-    if (isProcessing || imageQueue.length === 0) return;
-    
-    console.log("Démarrage scan avec PropellerAds...");
-    
-    // Afficher la publicité PropellerAds
-    showPropellerAd();
-    
-    // Attendre un délai puis lancer le scan en arrière-plan
-    setTimeout(async () => {
-        try {
-            await originalProcessAllImages.call(this);
-            scanComplete = true;
-            console.log("Scan terminé - PropellerAds continue selon timing");
-        } catch (error) {
-            console.error("Erreur scan:", error);
-            scanComplete = true;
-            throw error;
-        }
-    }, 5000); // 5s de délai pour laisser la pub se charger
-}
-
-// =======================================================================================
-// ÉTAPE 9: INITIALISATION
-// =======================================================================================
-
+// Charger PropellerAds au démarrage
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialiser PropellerAds
-    initializePropellerAds();
-    
-    console.log("PropellerAds initialisé - Zone ID:", PROPELLER_CONFIG.ZONE_ID);
+    loadPropellerAds();
 });
 
-// =======================================================================================
-// ÉTAPE 10: DEBUG ET STATISTIQUES
-// =======================================================================================
-
-function getPropellerStats() {
-    const sessionsToday = parseInt(localStorage.getItem('propeller_sessions_today') || '0');
-    const dailyEarnings = parseFloat(localStorage.getItem('propeller_earnings_today') || '0');
-    
-    return {
-        totalEarnings: totalEarnings,
-        dailyEarnings: dailyEarnings,
-        sessionsToday: sessionsToday,
-        averageEarningsPerSession: sessionsToday > 0 ? dailyEarnings / sessionsToday : 0,
-        estimatedMonthly: dailyEarnings * 30
-    };
+// Fonction pour tester
+function testAd() {
+    showAd();
 }
 
-// Debug console
-window.propellerDebug = {
-    show: showPropellerAd,
-    hide: hidePropellerAd,
-    stats: getPropellerStats,
-    forceComplete: () => { scanComplete = true; },
-    earnings: () => totalEarnings
+// Debug dans la console
+window.adDebug = {
+    show: showAd,
+    close: closeAd,
+    test: testAd
 };
 
-console.log("PropellerAds Video System chargé - Revenus estimés: €0.25-0.75 par utilisation");
+console.log("🎯 Système pub simple chargé - Tapez adDebug.show() pour tester");
+
+// =======================================================================================
+// INTÉGRATION AVEC VOTRE SCANNER POKEMON
+// =======================================================================================
+
+// Si vous avez une fonction qui lance le scan, remplacez-la par ça :
+/*
+function startScan() {
+    showAd(); // Afficher la pub d'abord
+    
+    // Attendre 5 secondes puis lancer le vrai scan
+    setTimeout(() => {
+        // Votre code de scan original ici
+        processAllImages(); // ou votre fonction
+    }, 5000);
+}
+*/
 
 
