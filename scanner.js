@@ -1418,9 +1418,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-// =======================================================================================
-// PROPELLERADS SIMPLE - JUSTE UNE PUB QUI MARCHE
-// =======================================================================================
+
+
+
 
 
 // =======================================================================================
@@ -1428,7 +1428,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // =======================================================================================
 
 const PROPELLER_CONFIG = {
-    ZONE_ID: "9871908", // Remplacer par votre vraie zone ID
+    ZONE_ID: "VOTRE_ZONE_ID", // Remplacer par votre vraie zone ID
     TIMER_SECONDS: 30 // 30 secondes minimum
 };
 
@@ -1661,28 +1661,47 @@ function closeAd() {
 }
 
 function triggerPropellerAd() {
-    // Essayer de déclencher PropellerAds
+    console.log("🎯 Déclenchement pub PropellerAds zone 9871908");
+    
     try {
+        // Méthode 1 : Via window.PropellerAds si disponible
         if (typeof window.PropellerAds !== 'undefined') {
-            // Remplacer le contenu loading par la vraie pub
             const adZone = document.getElementById('propeller-ad-zone');
             if (adZone) {
-                adZone.innerHTML = '<div id="propeller-target"></div>';
+                adZone.innerHTML = '<div id="propeller-target-9871908"></div>';
+                
+                window.PropellerAds.show({
+                    zoneId: '9871908',
+                    target: 'propeller-target-9871908'
+                });
             }
-            
-            // Déclencher PropellerAds
-            window.PropellerAds.show({
-                zoneId: PROPELLER_CONFIG.ZONE_ID,
-                target: 'propeller-target'
-            });
-            
-            console.log("PropellerAds déclenché");
-        } else {
-            console.log("PropellerAds pas encore chargé");
+        } 
+        // Méthode 2 : Injection directe du script
+        else {
+            const adZone = document.getElementById('propeller-ad-zone');
+            if (adZone) {
+                adZone.innerHTML = `
+                    <script async data-cfasync="false" src="//iclickcdn.com/tag.min.js" data-zone="9871908"></script>
+                `;
+            }
         }
+        
+        console.log("✅ Pub PropellerAds injectée");
+        
     } catch (error) {
-        console.warn("Erreur PropellerAds:", error);
-        // Garder juste le loading si ça marche pas
+        console.warn("⚠️ Erreur PropellerAds:", error);
+        
+        // Fallback : message simple
+        const adZone = document.getElementById('propeller-ad-zone');
+        if (adZone) {
+            adZone.innerHTML = `
+                <div style="padding: 40px; text-align: center; color: #666;">
+                    <h3>📱 Publicité</h3>
+                    <p>Zone ID : 9871908 configurée</p>
+                    <p>En attente d'activation...</p>
+                </div>
+            `;
+        }
     }
 }
 
@@ -1708,22 +1727,5 @@ window.adDebug = {
 };
 
 console.log("🎯 Système pub simple chargé - Tapez adDebug.show() pour tester");
-
-// =======================================================================================
-// INTÉGRATION AVEC VOTRE SCANNER POKEMON
-// =======================================================================================
-
-// Si vous avez une fonction qui lance le scan, remplacez-la par ça :
-/*
-function startScan() {
-    showAd(); // Afficher la pub d'abord
-    
-    // Attendre 5 secondes puis lancer le vrai scan
-    setTimeout(() => {
-        // Votre code de scan original ici
-        processAllImages(); // ou votre fonction
-    }, 5000);
-}
-*/
 
 
