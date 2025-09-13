@@ -1411,12 +1411,6 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 });
 
-// Call this function at the end of your successful scan to auto-collapse tutorial:
-// if (typeof autoCollapseTutorial === 'function') {
-//     autoCollapseTutorial();
-// }
-
-
 
 // =======================================================================================
 // PROPELLERADS SIMPLE - JUSTE UNE PUB QUI MARCHE
@@ -1724,9 +1718,14 @@ document.addEventListener('DOMContentLoaded', function() {
     loadPropellerAds();
 });
 
-// Fonction pour tester
+// Fonction pour tester (globale pour être accessible)
 function testAd() {
     showAd();
+}
+
+function skipToMainSite() {
+    console.log("🏠 Redirection vers le site principal");
+    window.location.href = 'https://pokebinderdex.github.io';
 }
 
 //
@@ -1758,3 +1757,16 @@ console.log("🎯 Système pub simple chargé - Tapez adDebug.show() pour tester
 // =======================================================================================
 // INTÉGRATION AVEC VOTRE SCANNER POKEMON
 // =======================================================================================
+
+// Si vous avez une fonction qui lance le scan, remplacez-la par ça :
+/*
+function startScan() {
+    showAd(); // Afficher la pub d'abord
+    
+    // Attendre 5 secondes puis lancer le vrai scan
+    setTimeout(() => {
+        // Votre code de scan original ici
+        processAllImages(); // ou votre fonction
+    }, 5000);
+}
+*/
