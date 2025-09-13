@@ -1433,7 +1433,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 const PROPELLER_CONFIG = {
     ZONE_ID: "9871908", // Remplacer par votre vraie zone ID
-    TIMER_SECONDS: 30 // 30 secondes minimum
+    TIMER_SECONDS: 120 // 30 secondes minimum
 };
 
 let pubActive = false;
@@ -1444,8 +1444,11 @@ let timerInterval = null;
 // SCRIPT PROPELLERADS
 // =======================================================================================
 
-function loadPropellerAds() {
-    if (document.querySelector('#propeller-script')) return;
+function loadPropellerAds(callback) {
+    if (document.querySelector('#propeller-script')) {
+        if (callback) callback();
+        return;
+    }
     
     const script = document.createElement('script');
     script.id = 'propeller-script';
@@ -1454,10 +1457,16 @@ function loadPropellerAds() {
     script.async = true;
     
     script.onload = function() {
-        console.log("PropellerAds chargé");
+        console.log("✅ PropellerAds chargé");
+        if (callback) callback();
     };
     
     document.head.appendChild(script);
+}
+
+// Ensuite, pour tester :
+function testAd() {
+    loadPropellerAds(() => showAd());
 }
 
 // =======================================================================================
@@ -1684,9 +1693,7 @@ function triggerPropellerAd() {
         else {
             const adZone = document.getElementById('propeller-ad-zone');
             if (adZone) {
-                adZone.innerHTML = `
-                    <script async data-cfasync="false" src="//iclickcdn.com/tag.min.js" data-zone="9871908"></script>
-                `;
+                adZone.innerHTML = "marche pas";
             }
         }
         
