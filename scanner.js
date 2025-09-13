@@ -1428,7 +1428,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // =======================================================================================
 
 const PROPELLER_CONFIG = {
-    ZONE_ID: "VOTRE_ZONE_ID", // Remplacer par votre vraie zone ID
+    ZONE_ID: "9871908", // Remplacer par votre vraie zone ID
     TIMER_SECONDS: 30 // 30 secondes minimum
 };
 
