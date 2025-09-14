@@ -2,12 +2,12 @@
 <html>
 <head><meta charset="utf-8"><title>Payer</title></head>
 <body>
-<h2>TEST  au Pokédex</h2>
+<h2>TEST</h2>
 <button id="payBtn">Payer 5€</button>
 
 <script src="https://js.stripe.com/v3/"></script>
 <script>
-const stripe = Stripe("pk_test_51S7Goh4KJAy57ttRNkPX4jt4EYfmjnB7SRPSGLdqwf3G2c7gbUJb3C8nO5ktWUBaKuA53y5YnVJdRA6zeHZDavqY00jA0aazSo"); // ta clé publique
+const stripe = Stripe("pk_test_51S7Goh4KJAy57ttRX7Xi0c2jri9BrsRdZm3EjU244EyGB5CkLWPsigqMEXDRyKQAZVeUwSIDoyxdy3BgobhjzbaQ00Hc9vUecJ"); // ta clé publique
 const SERVER_URL = "http://localhost:4242";
 
 document.getElementById("payBtn").addEventListener("click", async () => {
