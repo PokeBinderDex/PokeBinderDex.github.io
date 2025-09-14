@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokemon PDF Generator</title>
+    <title>Pokemon PDF Generator - Premium Access</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -43,12 +43,79 @@
             opacity: 0.9;
         }
 
+        .premium-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
+            color: #333;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-left: 10px;
+            box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
+        }
+
         .main-card {
             background: white;
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             animation: fadeInUp 1s ease-out;
+        }
+
+        .access-status {
+            text-align: center;
+            padding: 40px 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            font-size: 1.5em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .access-status.loading {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
+            color: #4a5568;
+        }
+
+        .access-status.granted {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            box-shadow: 0 10px 25px rgba(72, 187, 120, 0.3);
+        }
+
+        .access-status.denied {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: white;
+            box-shadow: 0 10px 25px rgba(245, 101, 101, 0.3);
+        }
+
+        .access-icon {
+            font-size: 2em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #cbd5e0;
+            border-radius: 50%;
+            border-top-color: #4a5568;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        .app-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .app-content.visible {
+            display: block;
+            opacity: 1;
         }
 
         .section {
@@ -155,7 +222,7 @@
         }
 
         .scanner-notice {
-            background: linear-gradient(135deg, #ffb52c 0%, #ffb011 100%);
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
             color: white;
             padding: 15px;
             border-radius: 12px;
@@ -163,7 +230,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
         }
 
         .scanner-notice a {
@@ -198,6 +265,7 @@
 
         .quick-btn:hover {
             background: #cbd5e0;
+            transform: translateY(-1px);
         }
 
         .selected-pokemon {
@@ -361,6 +429,36 @@
             color: #c53030;
         }
 
+        .access-denied-info {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 12px;
+            color: #4a5568;
+        }
+
+        .access-denied-info h3 {
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+
+        .contact-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .contact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-30px); }
             to { opacity: 1; transform: translateY(0); }
@@ -381,6 +479,11 @@
             to { transform: rotate(360deg); }
         }
 
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2em;
@@ -399,113 +502,140 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Pokemon PDF Generator</h1>
-            <p>Create custom Pokemon card PDFs in just a few clicks!</p>
+            <h1>Pokemon PDF Generator <span class="premium-badge">PREMIUM</span></h1>
+            <p>Create custom Pokemon card PDFs with premium access!</p>
         </div>
 
         <div class="main-card">
-            <!-- Search Section -->
-            <div class="section">
-                <h2><i class="fas fa-search"></i> Pokemon Search</h2>
-                <div class="search-container">
-                    <input 
-                        type="text" 
-                        class="search-input" 
-                        id="searchInput"
-                        placeholder="Type name or number (e.g. Pikachu, 25)"
-                    >
-                    <div class="search-results" id="searchResults"></div>
-                </div>
-                
-                <!-- Scanner Notice -->
-                <div class="scanner-notice">
-                    <div>
-                        <strong>Tip:</strong> Use our <a href="https://pokebinderdex.github.io/scanner.html" target="_blank">Binder Scanner</a> to scan your collection and automatically identify missing Pokemon to copy and paste here !
-                    </div>
-                </div>
-                
-                <!-- Bulk Selection -->
-                <div class="quick-select">
-                    <h3 style="margin-bottom: 10px; color: #4a5568;">Bulk Selection:</h3>
-                    <textarea 
-                        id="bulkInput" 
-                        placeholder="Paste Pokemon numbers separated by commas (e.g. 001, 025, 150, 249)" 
-                        style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; resize: vertical; min-height: 60px; margin-bottom: 10px;"
-                    ></textarea>
-                    <button class="quick-btn" onclick="processBulkSelection()">Add from List</button>
-                </div>
-                
-                <!-- Generation Selection -->
-                <div class="quick-select">
-                    <h3 style="margin-bottom: 10px; color: #4a5568;">Quick Selection:</h3>
-                    <div class="quick-buttons">
-                        <button class="quick-btn" onclick="addGeneration(1)">Gen 1 (1-151)</button>
-                        <button class="quick-btn" onclick="addGeneration(2)">Gen 2 (152-251)</button>
-                        <button class="quick-btn" onclick="addGeneration(3)">Gen 3 (252-386)</button>
-                        <button class="quick-btn" onclick="addGeneration(4)">Gen 4 (387-493)</button>
-                        <button class="quick-btn" onclick="addGeneration(5)">Gen 5 (494-649)</button>
-                        <button class="quick-btn" onclick="addGeneration(6)">Gen 6 (650-721)</button>
-                        <button class="quick-btn" onclick="addGeneration(7)">Gen 7 (722-809)</button>
-                        <button class="quick-btn" onclick="addGeneration(8)">Gen 8 (810-905)</button>
-                        <button class="quick-btn" onclick="clearSelection()">Clear</button>
-                    </div>
-                </div>
+            <!-- Access Status Section -->
+            <div class="access-status loading" id="accessStatus">
+                <span class="access-icon">
+                    <span class="spinner"></span>
+                </span>
+                Verifying payment access...
             </div>
 
-            <!-- Selection Section -->
-            <div class="section">
-                <h2><i class="fas fa-heart"></i> Selected Pokemon (<span id="pokemonCount">0</span>)</h2>
-                <div class="selected-pokemon" id="selectedPokemon">
-                    <div class="empty-state">No Pokemon selected. Use the search above or bulk selection.</div>
-                </div>
+            <!-- Access Denied Information -->
+            <div class="access-denied-info" id="accessDeniedInfo" style="display: none;">
+                <h3><i class="fas fa-lock"></i> Premium Access Required</h3>
+                <p>This Pokemon PDF generator requires a valid payment to access all premium features.</p>
+                <p>Please ensure you have a valid access token or contact support for assistance.</p>
+                <a href="#" class="contact-btn">
+                    <i class="fas fa-envelope"></i> Contact Support
+                </a>
             </div>
 
-            <!-- Style Section -->
-            <div class="section">
-                <h2><i class="fas fa-palette"></i> Generation Style</h2>
-                <div class="style-selector">
-                    <div class="style-option selected" data-style="black">
-                        <h3>Black Silhouettes</h3>
-                        <p>Pokemon entirely black on white background</p>
-                    </div>
-                    <div class="style-option" data-style="outline">
-                        <h3>Outline</h3>
-                        <p>Just the outlines of Pokemon</p>
-                    </div>
-                      <div class="style-option" data-style="light">
-                        <h3>Outline light</h3>
-                        <p>Lighter outlines</p>
-                    </div>
-                    <div class="style-option" data-style="ultralight">
-                        <h3>Outline Ultra Light</h3>
-                        <p>Subtle gray outlines, all black and white</p>
+            <!-- Main Application Content -->
+            <div class="app-content" id="appContent">
+                <!-- Search Section -->
+                <div class="section">
+                    <h2><i class="fas fa-search"></i> Pokemon Search</h2>
+                    <div class="search-container">
+                        <input 
+                            type="text" 
+                            class="search-input" 
+                            id="searchInput"
+                            placeholder="Type name or number (e.g. Pikachu, 25)"
+                        >
+                        <div class="search-results" id="searchResults"></div>
                     </div>
                     
+                    <!-- Scanner Notice -->
+                    <div class="scanner-notice">
+                        <i class="fas fa-camera"></i>
+                        <div>
+                            <strong>Pro Tip:</strong> Use our <a href="https://pokebinderdex.github.io/scanner.html" target="_blank">Binder Scanner</a> to scan your collection and automatically identify missing Pokemon to copy and paste here!
+                        </div>
+                    </div>
+                    
+                    <!-- Bulk Selection -->
+                    <div class="quick-select">
+                        <h3 style="margin-bottom: 10px; color: #4a5568;">Bulk Selection:</h3>
+                        <textarea 
+                            id="bulkInput" 
+                            placeholder="Paste Pokemon numbers separated by commas (e.g. 001, 025, 150, 249)" 
+                            style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; resize: vertical; min-height: 60px; margin-bottom: 10px;"
+                        ></textarea>
+                        <button class="quick-btn" onclick="processBulkSelection()">
+                            <i class="fas fa-plus"></i> Add from List
+                        </button>
+                    </div>
+                    
+                    <!-- Generation Selection -->
+                    <div class="quick-select">
+                        <h3 style="margin-bottom: 10px; color: #4a5568;">Quick Selection by Generation:</h3>
+                        <div class="quick-buttons">
+                            <button class="quick-btn" onclick="addGeneration(1)">Gen 1 (1-151)</button>
+                            <button class="quick-btn" onclick="addGeneration(2)">Gen 2 (152-251)</button>
+                            <button class="quick-btn" onclick="addGeneration(3)">Gen 3 (252-386)</button>
+                            <button class="quick-btn" onclick="addGeneration(4)">Gen 4 (387-493)</button>
+                            <button class="quick-btn" onclick="addGeneration(5)">Gen 5 (494-649)</button>
+                            <button class="quick-btn" onclick="addGeneration(6)">Gen 6 (650-721)</button>
+                            <button class="quick-btn" onclick="addGeneration(7)">Gen 7 (722-809)</button>
+                            <button class="quick-btn" onclick="addGeneration(8)">Gen 8 (810-905)</button>
+                            <button class="quick-btn" onclick="clearSelection()" style="background: #fed7d7; color: #c53030;">
+                                <i class="fas fa-trash"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Generation Section -->
-            <div class="section">
-                <button class="generate-btn" id="generateBtn">
-                    <i class="fas fa-spinner loading" id="loadingIcon"></i>
-                    <i class="fas fa-file-pdf"></i>
-                    Generate PDF
-                </button>
-                <div class="status-message" id="statusMessage"></div>
+                <!-- Selection Section -->
+                <div class="section">
+                    <h2><i class="fas fa-heart"></i> Selected Pokemon (<span id="pokemonCount">0</span>)</h2>
+                    <div class="selected-pokemon" id="selectedPokemon">
+                        <div class="empty-state">No Pokemon selected. Use the search above or bulk selection.</div>
+                    </div>
+                </div>
+
+                <!-- Style Section -->
+                <div class="section">
+                    <h2><i class="fas fa-palette"></i> Generation Style</h2>
+                    <div class="style-selector">
+                        <div class="style-option selected" data-style="black">
+                            <h3><i class="fas fa-fill-drip"></i> Black Silhouettes</h3>
+                            <p>Pokemon entirely black on white background</p>
+                        </div>
+                        <div class="style-option" data-style="outline">
+                            <h3><i class="fas fa-draw-polygon"></i> Outline</h3>
+                            <p>Just the outlines of Pokemon</p>
+                        </div>
+                        <div class="style-option" data-style="light">
+                            <h3><i class="fas fa-feather"></i> Outline Light</h3>
+                            <p>Lighter outlines for subtle appearance</p>
+                        </div>
+                        <div class="style-option" data-style="ultralight">
+                            <h3><i class="fas fa-sun"></i> Outline Ultra Light</h3>
+                            <p>Subtle gray outlines, all black and white</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generation Section -->
+                <div class="section">
+                    <button class="generate-btn" id="generateBtn">
+                        <i class="fas fa-spinner loading" id="loadingIcon"></i>
+                        <i class="fas fa-file-pdf"></i>
+                        Generate Premium PDF
+                    </button>
+                    <div class="status-message" id="statusMessage"></div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Configuration de l'API
+        // Configuration
+        const SERVER_URL = "https://serverpps-5wfx.onrender.com";
         const API_BASE = 'https://leonheart2b-personaliseddex.hf.space';
         
-        // État global
+        // Global state
         let selectedPokemon = [];
         let selectedStyle = 'black';
         let searchTimeout;
+        let accessGranted = false;
 
-        // Éléments DOM
+        // DOM elements
         const searchInput = document.getElementById('searchInput');
         const searchResults = document.getElementById('searchResults');
         const selectedContainer = document.getElementById('selectedPokemon');
@@ -513,40 +643,111 @@
         const loadingIcon = document.getElementById('loadingIcon');
         const statusMessage = document.getElementById('statusMessage');
         const pokemonCount = document.getElementById('pokemonCount');
+        const accessStatus = document.getElementById('accessStatus');
+        const appContent = document.getElementById('appContent');
+        const accessDeniedInfo = document.getElementById('accessDeniedInfo');
 
-        // Gestionnaire de recherche avec debounce
-        searchInput.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            const query = e.target.value.trim();
+        // Initialize payment check
+        async function checkAccess() {
+            const params = new URLSearchParams(window.location.search);
+            const token = params.get("access_token");
             
-            if (query.length < 1) {
-                hideSearchResults();
+            if (!token) {
+                showAccessDenied("No access token provided");
                 return;
             }
-            
-            searchTimeout = setTimeout(() => searchPokemon(query), 300);
-        });
 
-        // Cacher les résultats quand on clique ailleurs
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.search-container')) {
-                hideSearchResults();
+            try {
+                const response = await fetch(`${SERVER_URL}/validate-token?token=${token}`);
+                const data = await response.json();
+                
+                if (data.valid) {
+                    showAccessGranted();
+                } else {
+                    showAccessDenied("Invalid or expired access token");
+                }
+            } catch (error) {
+                console.error('Access validation error:', error);
+                showAccessDenied("Unable to validate access token");
             }
-        });
+        }
 
-        // Gestionnaires de style
-        document.querySelectorAll('.style-option').forEach(option => {
-            option.addEventListener('click', () => {
-                document.querySelector('.style-option.selected').classList.remove('selected');
-                option.classList.add('selected');
-                selectedStyle = option.dataset.style;
+        function showAccessGranted() {
+            accessGranted = true;
+            accessStatus.className = 'access-status granted';
+            accessStatus.innerHTML = `
+                <span class="access-icon"><i class="fas fa-check-circle"></i></span>
+                Payment Verified ✅ - Premium Access Granted!
+            `;
+            
+            setTimeout(() => {
+                appContent.classList.add('visible');
+                initializeApp();
+            }, 1000);
+        }
+
+        function showAccessDenied(reason) {
+            accessStatus.className = 'access-status denied';
+            accessStatus.innerHTML = `
+                <span class="access-icon"><i class="fas fa-times-circle"></i></span>
+                Access Denied ❌
+            `;
+            accessDeniedInfo.style.display = 'block';
+            console.log('Access denied:', reason);
+        }
+
+        function initializeApp() {
+            // Search handler with debounce
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                const query = e.target.value.trim();
+                
+                if (query.length < 1) {
+                    hideSearchResults();
+                    return;
+                }
+                
+                searchTimeout = setTimeout(() => searchPokemon(query), 300);
             });
-        });
 
-        // Gestionnaire du bouton de génération
-        generateBtn.addEventListener('click', generatePDF);
+            // Hide search results when clicking elsewhere
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.search-container')) {
+                    hideSearchResults();
+                }
+            });
 
-        // Fonctions de recherche
+            // Style selection handlers
+            document.querySelectorAll('.style-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    document.querySelector('.style-option.selected').classList.remove('selected');
+                    option.classList.add('selected');
+                    selectedStyle = option.dataset.style;
+                });
+            });
+
+            // Generate button handler
+            generateBtn.addEventListener('click', generatePDF);
+
+            // Test API connection
+            testAPIConnection();
+        }
+
+        async function testAPIConnection() {
+            try {
+                const response = await fetch(`${API_BASE}/`);
+                if (response.ok) {
+                    showStatus('API connected successfully!', 'success');
+                } else {
+                    throw new Error('API not accessible');
+                }
+            } catch (error) {
+                showStatus('⚠️ API connection issue detected', 'error');
+                console.error('API connection error:', error);
+            }
+        }
+
+        // Search functions
         async function searchPokemon(query) {
             try {
                 const response = await fetch(`${API_BASE}/search`, {
@@ -617,6 +818,8 @@
 
         // Bulk Selection Function
         function processBulkSelection() {
+            if (!accessGranted) return;
+            
             const bulkText = document.getElementById('bulkInput').value;
             if (!bulkText.trim()) {
                 showStatus('Please enter Pokemon numbers', 'error');
@@ -627,15 +830,13 @@
             let addedCount = 0;
 
             const promises = numbers.map(async (numStr) => {
-                // Handle both formats: "001" and "1" 
                 let number;
                 if (numStr.match(/^\d{1,3}$/)) {
                     number = parseInt(numStr);
                 } else {
-                    return; // Skip invalid formats
+                    return;
                 }
 
-                // Avoid duplicates
                 if (selectedPokemon.some(p => parseInt(p.number) === number)) {
                     return;
                 }
@@ -677,12 +878,13 @@
         };
 
         function addGeneration(gen) {
+            if (!accessGranted) return;
+            
             const [start, end] = generationRanges[gen];
             let addedCount = 0;
             
             const promises = [];
             for (let i = start; i <= end; i++) {
-                // Avoid duplicates
                 if (selectedPokemon.some(p => parseInt(p.number) === i)) {
                     continue;
                 }
@@ -705,14 +907,15 @@
             }
 
             Promise.all(promises).then(() => {
-                // Sort Pokemon by number in ascending order
                 selectedPokemon.sort((a, b) => parseInt(a.number) - parseInt(b.number));
                 updateSelectedDisplay();
-                showStatus(`Generation ${gen} Pokemon added!`, 'success');
+                showStatus(`Generation ${gen} Pokemon added! (${addedCount} found)`, 'success');
             });
         }
 
         function clearSelection() {
+            if (!accessGranted) return;
+            
             selectedPokemon = [];
             updateSelectedDisplay();
             showStatus('Selection cleared', 'success');
@@ -720,6 +923,8 @@
 
         // Functions for managing selected Pokemon
         function addPokemon(pokemon) {
+            if (!accessGranted) return;
+            
             const pokemonNumber = parseInt(pokemon.number);
             
             // Avoid duplicates
@@ -739,6 +944,8 @@
         }
 
         function removePokemon(number) {
+            if (!accessGranted) return;
+            
             selectedPokemon = selectedPokemon.filter(p => parseInt(p.number) !== parseInt(number));
             updateSelectedDisplay();
             showStatus('Pokemon removed', 'success');
@@ -767,6 +974,11 @@
 
         // PDF Generation Function
         async function generatePDF() {
+            if (!accessGranted) {
+                showStatus('Premium access required to generate PDFs', 'error');
+                return;
+            }
+            
             if (selectedPokemon.length === 0) {
                 showStatus('Please select at least one Pokemon', 'error');
                 return;
@@ -798,13 +1010,13 @@
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `pokemon_${selectedStyle}_${selectedPokemon.length}.pdf`;
+                a.download = `pokemon_premium_${selectedStyle}_${selectedPokemon.length}.pdf`;
                 document.body.appendChild(a);
                 a.click();
                 window.URL.revokeObjectURL(url);
                 document.body.removeChild(a);
 
-                showStatus(`PDF generated successfully! (${selectedPokemon.length} Pokemon)`, 'success');
+                showStatus(`Premium PDF generated successfully! (${selectedPokemon.length} Pokemon)`, 'success');
             } catch (error) {
                 console.error('Generation error:', error);
                 showStatus('Error during PDF generation: ' + error.message, 'error');
@@ -818,11 +1030,11 @@
             if (loading) {
                 generateBtn.disabled = true;
                 loadingIcon.classList.add('active');
-                generateBtn.innerHTML = '<i class="fas fa-spinner loading active"></i>Generating...';
+                generateBtn.innerHTML = '<i class="fas fa-spinner loading active"></i>Generating Premium PDF...';
             } else {
                 generateBtn.disabled = false;
                 loadingIcon.classList.remove('active');
-                generateBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Generate PDF';
+                generateBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Generate Premium PDF';
             }
         }
 
@@ -836,20 +1048,8 @@
             }, 4000);
         }
 
-        // API Connection Test
-        window.addEventListener('load', async () => {
-            try {
-                const response = await fetch(`${API_BASE}/`);
-                if (response.ok) {
-                    showStatus('API connected successfully!', 'success');
-                } else {
-                    throw new Error('API not accessible');
-                }
-            } catch (error) {
-                showStatus('⚠️ Check your API URL in the code', 'error');
-                console.error('API connection error:', error);
-            }
-        });
+        // Initialize on page load
+        window.addEventListener('load', checkAccess);
     </script>
 </body>
 </html>
