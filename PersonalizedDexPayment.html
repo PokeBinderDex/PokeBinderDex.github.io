@@ -1,38 +1,78 @@
-
-
 <!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"><title>Payer</title></head>
+<head>
+  <meta charset="utf-8">
+  <title>Payer au Pokédex</title>
+</head>
 <body>
-  <h2>Payer au Pokédex</h2>
+  <h2>Payer pour accéder au Pokédex</h2>
 
   <label for="email">Votre email :</label>
   <input type="email" id="email" placeholder="email@example.com" required>
   <button id="payBtn">Payer 5€</button>
 
+  <div id="message" style="margin-top:20px; font-weight:bold;"></div>
+
   <script src="https://js.stripe.com/v3/"></script>
   <script>
-    const stripe = Stripe("pk_test_51S7Goh4KJAy57ttRX7Xi0c2jri9BrsRdZm3EjU244EyGB5CkLWPsigqMEXDRyKQAZVeUwSIDoyxdy3BgobhjzbaQ00Hc9vUecJ"); // ta clé publique
+    // Clé publique Stripe
+    const stripe = Stripe("pk_test_51S7Goh4KJAy57ttRX7Xi0c2jri9BrsRdZm3EjU244EyGB5CkLWPsigqMEXDRyKQAZVeUwSIDoyxdy3BgobhjzbaQ00Hc9vUecJ");
+
+    // Ton serveur Render
     const SERVER_URL = "https://serverpps-5wfx.onrender.com";
 
+    const messageDiv = document.getElementById('message');
+
+    // Bouton paiement
     document.getElementById("payBtn").addEventListener("click", async () => {
       const email = document.getElementById("email").value.trim();
       if (!email) return alert("Renseigne un email valide");
 
-      const r = await fetch(`${SERVER_URL}/create-checkout-session`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-      const j = await r.json();
-      if (j.id) {
-        await stripe.redirectToCheckout({ sessionId: j.id });
-      } else {
-        alert('Erreur création session');
-        console.error(j);
+      try {
+        const r = await fetch(`${SERVER_URL}/create-checkout-session`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const j = await r.json();
+        if (j.id) {
+          await stripe.redirectToCheckout({ sessionId: j.id });
+        } else {
+          alert('Erreur création session');
+          console.error(j);
+        }
+      } catch (err) {
+        console.error('Erreur fetch create-checkout-session:', err);
+        alert('Erreur serveur');
       }
     });
+
+    // Vérification du token après redirection Stripe
+    async function checkToken(token) {
+      try {
+        const r = await fetch(`${SERVER_URL}/validate-token?token=${token}`);
+        const j = await r.json();
+        return j.valid;
+      } catch (err) {
+        console.error('Erreur fetch validate-token:', err);
+        return false;
+      }
+    }
+
+    // Si on arrive sur la page avec access_token
+    (async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('access_token');
+      if (token) {
+        messageDiv.innerText = "Vérification du paiement…";
+        const valid = await checkToken(token);
+        if (valid) {
+          messageDiv.innerHTML = "✅ Paiement validé ! Accès au Pokédex accordé 🎉";
+        } else {
+          messageDiv.innerHTML = "❌ Paiement non validé ou expiré";
+        }
+      }
+    })();
   </script>
 </body>
 </html>
-
