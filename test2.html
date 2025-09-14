@@ -1,33 +1,22 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Test Pub PropellerAds</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Publicité OnClick</title>
 </head>
 <body>
+    <h1>Page de test</h1>
+    <p>Clique sur le bouton pour charger la publicité :</p>
+    <button id="loadAd">Afficher la pub</button>
 
-<button id="scannerBtn">Scanner</button>
-
-<!-- 🔑 PropellerAds Interstitial Tag -->
-<script async src="https://upgulpinon.com/1?z=9871908"></script> 
-<!-- Remplace XXXXX par TON ID/ZONE de PropellerAds -->
-
-<script>
-  document.getElementById("scannerBtn").addEventListener("click", function () {
-    // Si le script PropellerAds est chargé, la pub se lancera
-    if (typeof propellerAds === "undefined") {
-      console.log("PropellerAds pas encore prêt");
-    }
-    // ⚠ L'interstitial se déclenche automatiquement sur user click
-    // donc rien de plus à faire, juste lancer ton scanner après un délai
-    setTimeout(() => lancerScanner(), 4000); 
-  });
-
-  function lancerScanner() {
-    console.log("Scan en cours...");
-    // Ton code de scanner ici
-  }
-</script>
-
+    <script>
+        document.getElementById('loadAd').addEventListener('click', () => {
+            const script = document.createElement('script');
+            script.dataset.zone = '9873601';
+            script.src = 'https://al5sm.com/tag.min.js';
+            document.body.appendChild(script);
+        });
+    </script>
 </body>
 </html>
