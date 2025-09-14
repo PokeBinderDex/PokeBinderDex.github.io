@@ -1,9 +1,8 @@
+
+
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Payer</title>
-</head>
+<head><meta charset="utf-8"><title>Payer</title></head>
 <body>
   <h2>Payer pour accéder au Pokédex</h2>
 
@@ -13,29 +12,27 @@
 
   <script src="https://js.stripe.com/v3/"></script>
   <script>
-    const stripe = Stripe("pk_test_51S7Goh4KJAy57ttRX7Xi0c2jri9BrsRdZm3EjU244EyGB5CkLWPsigqMEXDRyKQAZVeUwSIDoyxdy3BgobhjzbaQ00Hc9vUecJ"); // ta clé publique
-    const SERVER_URL = "https://serverpps-5wfx.onrender.com";
+    const stripe = Stripe("pk_test_51S7Goh4KJAy57ttRX7Xi0c2jri9BrsRdZm3EjU244EyGB5CkLWPsigqMEXDRyKQAZVeUwSIDoyxdy3BgobhjzbaQ00Hc9vUecJ"); // TA clé publique test Stripe
+    const SERVER_URL = "https://leonheart2B-pokemon-card-scanner.hf.space"; // remplace par ton Space URL
 
     document.getElementById("payBtn").addEventListener("click", async () => {
       const email = document.getElementById("email").value.trim();
-      if (!email) {
-        alert("Veuillez renseigner votre email !");
-        return;
-      }
+      if (!email) return alert("Renseigne un email valide");
 
-      const response = await fetch(`${SERVER_URL}/create-checkout-session`, {
+      const r = await fetch(`${SERVER_URL}/create-checkout-session`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })  // envoie l'email au serveur
+        body: JSON.stringify({ email })
       });
-
-      const data = await response.json();
-      if (data.id) {
-        stripe.redirectToCheckout({ sessionId: data.id });
+      const j = await r.json();
+      if (j.id) {
+        await stripe.redirectToCheckout({ sessionId: j.id });
       } else {
-        alert("Erreur lors de la création de la session Stripe.");
+        alert('Erreur création session');
+        console.error(j);
       }
     });
   </script>
 </body>
 </html>
+
