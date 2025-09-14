@@ -91,21 +91,17 @@
         .preview-image {
             width: 100%;
             height: 300px;
-            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-            border: 2px dashed #cbd5e0;
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
             border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            position: relative;
             overflow: hidden;
+            margin-bottom: 20px;
         }
 
-        .preview-placeholder {
-            text-align: center;
-            color: #a0aec0;
-            font-size: 1.1em;
+        .preview-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .features-list {
@@ -139,34 +135,28 @@
         }
 
         .style-sample {
-            padding: 15px;
             border: 2px solid #e2e8f0;
             border-radius: 12px;
-            text-align: center;
-            background: #f7fafc;
+            overflow: hidden;
+            background: white;
         }
 
         .style-sample h4 {
             color: #4a5568;
-            margin-bottom: 10px;
+            padding: 15px;
+            text-align: center;
+            background: #f7fafc;
+            margin: 0;
             font-size: 0.9em;
+            border-bottom: 1px solid #e2e8f0;
         }
 
-        .style-sample .sample-box {
-            height: 60px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
+        .style-sample img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            display: block;
         }
-
-        .sample-black { background: #000; }
-        .sample-outline { background: white; border: 2px solid #333; color: #333; }
-        .sample-light { background: white; border: 1px solid #999; color: #999; }
-        .sample-ultralight { background: white; border: 1px solid #ccc; color: #ccc; }
 
         .payment-form {
             margin-bottom: 20px;
@@ -204,18 +194,12 @@
             margin-bottom: 20px;
         }
 
-        .price-summary .price-row {
+        .price-summary .total {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .price-summary .total {
             font-weight: bold;
             font-size: 1.2em;
             color: #4a5568;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 10px;
         }
 
         .pay-btn {
@@ -240,6 +224,12 @@
             box-shadow: 0 10px 25px rgba(72, 187, 120, 0.3);
         }
 
+        .pay-btn:disabled {
+            opacity: 0.7;
+            transform: none;
+            cursor: not-allowed;
+        }
+
         .security-info {
             margin-top: 15px;
             padding: 15px;
@@ -248,25 +238,6 @@
             text-align: center;
             font-size: 0.9em;
             color: #234e52;
-        }
-
-        .testimonial {
-            background: #f7fafc;
-            padding: 20px;
-            border-radius: 12px;
-            margin: 20px 0;
-            border-left: 4px solid #667eea;
-        }
-
-        .testimonial p {
-            color: #4a5568;
-            font-style: italic;
-            margin-bottom: 10px;
-        }
-
-        .testimonial .author {
-            color: #718096;
-            font-size: 0.9em;
         }
 
         #message {
@@ -278,8 +249,17 @@
             display: none;
         }
 
-        .success { background: #f0fff4; color: #276749; border: 1px solid #9ae6b4; }
-        .error { background: #fed7d7; color: #c53030; border: 1px solid #feb2b2; }
+        .success { 
+            background: #f0fff4; 
+            color: #276749; 
+            border: 1px solid #9ae6b4; 
+        }
+
+        .error { 
+            background: #fed7d7; 
+            color: #c53030; 
+            border: 1px solid #feb2b2; 
+        }
 
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-30px); }
@@ -332,57 +312,36 @@
                 </h2>
 
                 <div class="preview-image">
-                    <div class="preview-placeholder">
-                        <i class="fas fa-image" style="font-size: 3em; margin-bottom: 10px; color: #cbd5e0;"></i>
-                        <p>PDF Generation Interface</p>
-                        <small>Search, select, and generate in just a few clicks</small>
-                    </div>
+                    <img src="assets/perso/global_exemple.png" alt="PDF Generation Interface - Search, select, and generate in just a few clicks">
                 </div>
 
                 <h3 style="color: #4a5568; margin-bottom: 15px;">Included Features:</h3>
                 <ul class="features-list">
-                    <li><i class="fas fa-search"></i> Advanced search by name or number</li>
-                    <li><i class="fas fa-list"></i> Complete generation selection (Gen 1-8)</li>
+                    <li><i class="fas fa-search"></i> Search by name or number</li>
                     <li><i class="fas fa-copy"></i> Bulk import with number lists</li>
                     <li><i class="fas fa-palette"></i> 4 different rendering styles</li>
-                    <li><i class="fas fa-file-pdf"></i> High-quality PDF export</li>
-                    <li><i class="fas fa-mobile-alt"></i> Mobile responsive interface</li>
-                    <li><i class="fas fa-infinity"></i> Unlimited lifetime usage</li>
-                    <li><i class="fas fa-camera"></i> Compatible with our Binder Scanner</li>
+                    <li><i class="fas fa-camera"></i> Pairs with our Binder Scanner</li>
                 </ul>
 
                 <h3 style="color: #4a5568; margin: 25px 0 15px;">Available Rendering Styles:</h3>
                 <div class="style-preview">
                     <div class="style-sample">
                         <h4>Black Silhouettes</h4>
-                        <div class="sample-box sample-black">POKEMON</div>
+                        <img src="assets/perso/black_exemple.png" alt="Black silhouettes style example">
                     </div>
                     <div class="style-sample">
                         <h4>Outlines</h4>
-                        <div class="sample-box sample-outline">POKEMON</div>
+                        <img src="assets/perso/outline_exemple.png" alt="Outlines style example">
                     </div>
                     <div class="style-sample">
                         <h4>Light Outlines</h4>
-                        <div class="sample-box sample-light">POKEMON</div>
+                        <img src="assets/perso/light_exemple.png" alt="Light outlines style example">
                     </div>
                     <div class="style-sample">
                         <h4>Ultra Light</h4>
-                        <div class="sample-box sample-ultralight">POKEMON</div>
+                        <img src="assets/perso/ultralight_exemple.png" alt="Ultra light style example">
                     </div>
                 </div>
-
-                <div class="testimonial">
-                    <p>"Exactly what I was looking for to organize my collection! The interface is super intuitive and the PDFs are perfect."</p>
-                    <div class="author">— Sarah, collector for 15 years</div>
-                </div>
-
-                <h3 style="color: #4a5568; margin: 25px 0 15px;">Use Cases:</h3>
-                <ul class="features-list">
-                    <li><i class="fas fa-book"></i> Create missing card checklists</li>
-                    <li><i class="fas fa-print"></i> Print collection sheets</li>
-                    <li><i class="fas fa-share"></i> Share wishlist with friends</li>
-                    <li><i class="fas fa-organize"></i> Organize your trades</li>
-                </ul>
             </div>
 
             <div class="payment-section">
@@ -392,15 +351,7 @@
                 </h2>
 
                 <div class="price-summary">
-                    <div class="price-row">
-                        <span>Pokemon PDF Generator</span>
-                        <span>$2.40</span>
-                    </div>
-                    <div class="price-row">
-                        <span>Tax (20%)</span>
-                        <span>$0.45</span>
-                    </div>
-                    <div class="price-row total">
+                    <div class="total">
                         <span>Total</span>
                         <span>$2.85</span>
                     </div>
@@ -408,7 +359,7 @@
 
                 <div class="payment-form">
                     <div class="form-group">
-                        <label for="email">Your Email:</label>
+                        <label for="email">Your Email: (get link if error occur)</label>
                         <input type="email" id="email" placeholder="your@email.com" required>
                     </div>
                 </div>
@@ -425,10 +376,6 @@
                 </div>
 
                 <div id="message"></div>
-
-                <div style="margin-top: 20px; padding: 15px; background: #fff5f5; border-radius: 8px; font-size: 0.9em; color: #718096;">
-                    <p><strong>Refund Policy:</strong> Satisfied or money back within 7 days. Contact us if you have any issues.</p>
-                </div>
             </div>
         </div>
     </div>
