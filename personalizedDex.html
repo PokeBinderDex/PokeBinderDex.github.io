@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 Générateur de PDF Pokémon</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .search-result {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: background-color 0.2s;
+        }
+
+        .search-result:hover {
+            background: #f7fafc;
+        }
+
+        .search-result:last-child {
+            border-bottom: none;
+        }
+
+        .pokemon-thumbnail {
+            width: 40px;
+            height: 40px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            color: #666;
+            flex-shrink: 0;
+        }
+
+        .pokemon-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .pokemon-info {
+            flex-grow: 1;
+        }
+
+        .pokemon-name {
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .pokemon-types {
+            font-size: 0.9em;
+            color: #718096;
+            margin-top: 2px;
+        }
+
+        .selected-pokemon {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            min-height: 60px;
+            padding: 15px;
+            border: 2px dashed #e2e8f0;
+            border-radius: 12px;
+            background: #f7fafc;
+        }
+
+        .pokemon-tag {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #667eea;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .pokemon-tag .remove-btn {
+            cursor: pointer;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            transition: background-color 0.2s;
+        }
+
+        .pokemon-tag .remove-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .style-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .style-option {
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .style-option:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .style-option.selected {
+            border-color: #667eea;
+            background: #f7fafc;
+        }
+
+        .style-option h3 {
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .style-option p {
+            color: #718096;
+            font-size: 0.9em;
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+        }
+
+        .loading.active {
+            display: inline-block;
+            margin-right: 10px;
+            animation: spin 1s linear infinite;
+        }
+
+        .status-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .status-message.success {
+            background: #f0fff4;
+            border: 1px solid #9ae6b4;
+            color: #276749;
+        }
+
+        .status-message.error {
+            background: #fed7d7;
+            border: 1px solid #feb2b2;
+            color: #c53030;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #a0aec0;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        .quick-select {
+            margin-bottom: 20px;
+        }
+
+        .quick-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .quick-btn {
+            padding: 8px 16px;
+            background: #e2e8f0;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            background: #cbd5e0;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .main-card {
+                padding: 20px;
+            }
+            
+            .style-selector {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 Générateur de PDF Pokémon</h1>
+            <p>Créez des PDFs de cartes Pokémon personnalisés en quelques clics !</p>
+        </div>
+
+        <div class="main-card">
+            <!-- Section Recherche -->
+            <div class="section">
+                <h2><i class="fas fa-search"></i> Recherche de Pokémon</h2>
+                <div class="search-container">
+                    <input 
+                        type="text" 
+                        class="search-input" 
+                        id="searchInput"
+                        placeholder="Tapez un nom ou numéro (ex: Pikachu, 25)"
+                    >
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+                
+                <!-- Sélection rapide -->
+                <div class="quick-select">
+                    <h3 style="margin-bottom: 10px; color: #4a5568;">Sélection rapide :</h3>
+                    <div class="quick-buttons">
+                        <button class="quick-btn" onclick="addQuickSelection('1,4,7')">Starters Kanto</button>
+                        <button class="quick-btn" onclick="addQuickSelection('25,26')">Pikachu & Raichu</button>
+                        <button class="quick-btn" onclick="addQuickSelection('150,151,149')">Légendaires</button>
+                        <button class="quick-btn" onclick="addQuickSelection('1,2,3,4,5,6,7,8,9')">Top 9</button>
+                        <button class="quick-btn" onclick="clearSelection()">Vider</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Sélection -->
+            <div class="section">
+                <h2><i class="fas fa-star"></i> Pokémon Sélectionnés (<span id="pokemonCount">0</span>)</h2>
+                <div class="selected-pokemon" id="selectedPokemon">
+                    <div class="empty-state">Aucun Pokémon sélectionné. Utilisez la recherche ci-dessus.</div>
+                </div>
+            </div>
+
+            <!-- Section Style -->
+            <div class="section">
+                <h2><i class="fas fa-palette"></i> Style de Génération</h2>
+                <div class="style-selector">
+                    <div class="style-option selected" data-style="black">
+                        <h3>🖤 Silhouettes Noires</h3>
+                        <p>Pokémon entièrement noirs sur fond blanc</p>
+                    </div>
+                    <div class="style-option" data-style="outline">
+                        <h3>🔲 Contours Uniquement</h3>
+                        <p>Juste les contours des Pokémon</p>
+                    </div>
+                    <div class="style-option" data-style="ultralight">
+                        <h3>💫 Ultra Léger</h3>
+                        <p>Contours discrets en gris</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Génération -->
+            <div class="section">
+                <button class="generate-btn" id="generateBtn">
+                    <i class="fas fa-spinner loading" id="loadingIcon"></i>
+                    <i class="fas fa-file-pdf"></i>
+                    Générer le PDF
+                </button>
+                <div class="status-message" id="statusMessage"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration de l'API - CHANGEZ CETTE URL PAR CELLE DE VOTRE SPACE
+        const API_BASE = 'https://YOUR_USERNAME-pokemon-pdf-generator.hf.space';
+        
+        // État global
+        let selectedPokemon = [];
+        let selectedStyle = 'black';
+        let searchTimeout;
+
+        // Éléments DOM
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        const selectedContainer = document.getElementById('selectedPokemon');
+        const generateBtn = document.getElementById('generateBtn');
+        const loadingIcon = document.getElementById('loadingIcon');
+        const statusMessage = document.getElementById('statusMessage');
+        const pokemonCount = document.getElementById('pokemonCount');
+
+        // Gestionnaire de recherche avec debounce
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            const query = e.target.value.trim();
+            
+            if (query.length < 1) {
+                hideSearchResults();
+                return;
+            }
+            
+            searchTimeout = setTimeout(() => searchPokemon(query), 300);
+        });
+
+        // Cacher les résultats quand on clique ailleurs
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-container')) {
+                hideSearchResults();
+            }
+        });
+
+        // Gestionnaires de style
+        document.querySelectorAll('.style-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelector('.style-option.selected').classList.remove('selected');
+                option.classList.add('selected');
+                selectedStyle = option.dataset.style;
+            });
+        });
+
+        // Gestionnaire du bouton de génération
+        generateBtn.addEventListener('click', generatePDF);
+
+        // Fonctions de recherche
+        async function searchPokemon(query) {
+            try {
+                const response = await fetch(`${API_BASE}/search`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erreur de recherche');
+                }
+
+                const data = await response.json();
+                displaySearchResults(data.results);
+            } catch (error) {
+                console.error('Erreur de recherche:', error);
+                showStatus('Erreur lors de la recherche', 'error');
+            }
+        }
+
+        function displaySearchResults(results) {
+            if (results.length === 0) {
+                hideSearchResults();
+                return;
+            }
+
+            searchResults.innerHTML = '';
+            
+            results.forEach(pokemon => {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'search-result';
+                resultDiv.onclick = () => addPokemon(pokemon);
+
+                const thumbnail = document.createElement('div');
+                thumbnail.className = 'pokemon-thumbnail';
+                
+                if (pokemon.image_available) {
+                    const img = document.createElement('img');
+                    img.src = `${API_BASE}/pokemon/${parseInt(pokemon.number)}/image`;
+                    img.onerror = () => {
+                        thumbnail.textContent = '#' + pokemon.number;
+                    };
+                    thumbnail.appendChild(img);
+                } else {
+                    thumbnail.textContent = '#' + pokemon.number;
+                }
+
+                const info = document.createElement('div');
+                info.className = 'pokemon-info';
+                info.innerHTML = `
+                    <div class="pokemon-name">#${pokemon.number} ${pokemon.name}</div>
+                    <div class="pokemon-types">${pokemon.type1}${pokemon.type2 ? ' / ' + pokemon.type2 : ''}</div>
+                `;
+
+                resultDiv.appendChild(thumbnail);
+                resultDiv.appendChild(info);
+                searchResults.appendChild(resultDiv);
+            });
+
+            searchResults.style.display = 'block';
+        }
+
+        function hideSearchResults() {
+            searchResults.style.display = 'none';
+        }
+
+        // Fonctions de gestion des Pokémon sélectionnés
+        function addPokemon(pokemon) {
+            const pokemonNumber = parseInt(pokemon.number);
+            
+            // Éviter les doublons
+            if (selectedPokemon.some(p => parseInt(p.number) === pokemonNumber)) {
+                showStatus('Ce Pokémon est déjà sélectionné', 'error');
+                hideSearchResults();
+                return;
+            }
+
+            selectedPokemon.push(pokemon);
+            updateSelectedDisplay();
+            hideSearchResults();
+            searchInput.value = '';
+            showStatus(`${pokemon.name} ajouté !`, 'success');
+        }
+
+        function removePokemon(number) {
+            selectedPokemon = selectedPokemon.filter(p => parseInt(p.number) !== parseInt(number));
+            updateSelectedDisplay();
+            showStatus('Pokémon retiré', 'success');
+        }
+
+        function updateSelectedDisplay() {
+            pokemonCount.textContent = selectedPokemon.length;
+            
+            if (selectedPokemon.length === 0) {
+                selectedContainer.innerHTML = '<div class="empty-state">Aucun Pokémon sélectionné. Utilisez la recherche ci-dessus.</div>';
+                return;
+            }
+
+            selectedContainer.innerHTML = selectedPokemon.map(pokemon => `
+                <div class="pokemon-tag">
+                    <span>#${pokemon.number} ${pokemon.name}</span>
+                    <div class="remove-btn" onclick="removePokemon('${pokemon.number}')">×</div>
+                </div>
+            `).join('');
+        }
+
+        // Fonctions de sélection rapide
+        function addQuickSelection(numbers) {
+            const numbersList = numbers.split(',');
+            
+            numbersList.forEach(async (num) => {
+                const number = parseInt(num.trim());
+                
+                // Éviter les doublons
+                if (selectedPokemon.some(p => parseInt(p.number) === number)) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${API_BASE}/pokemon/${number}`);
+                    if (response.ok) {
+                        const pokemon = await response.json();
+                        selectedPokemon.push(pokemon);
+                        updateSelectedDisplay();
+                    }
+                } catch (error) {
+                    console.error(`Erreur pour le Pokémon ${number}:`, error);
+                }
+            });
+        }
+
+        function clearSelection() {
+            selectedPokemon = [];
+            updateSelectedDisplay();
+            showStatus('Sélection vidée', 'success');
+        }
+
+        // Fonction de génération PDF
+        async function generatePDF() {
+            if (selectedPokemon.length === 0) {
+                showStatus('Veuillez sélectionner au moins un Pokémon', 'error');
+                return;
+            }
+
+            setLoading(true);
+            
+            const pokemonNumbers = selectedPokemon.map(p => parseInt(p.number)).join(',');
+            
+            try {
+                const response = await fetch(`${API_BASE}/generate-pdf`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        pokemon_numbers: pokemonNumbers,
+                        style: selectedStyle
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Erreur lors de la génération');
+                }
+
+                // Télécharger le fichier PDF
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `pokemon_${selectedStyle}_${selectedPokemon.length}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                showStatus(`PDF généré avec succès ! (${selectedPokemon.length} Pokémon)`, 'success');
+            } catch (error) {
+                console.error('Erreur de génération:', error);
+                showStatus('Erreur lors de la génération du PDF: ' + error.message, 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // Fonctions utilitaires
+        function setLoading(loading) {
+            if (loading) {
+                generateBtn.disabled = true;
+                loadingIcon.classList.add('active');
+                generateBtn.innerHTML = '<i class="fas fa-spinner loading active"></i>Génération en cours...';
+            } else {
+                generateBtn.disabled = false;
+                loadingIcon.classList.remove('active');
+                generateBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Générer le PDF';
+            }
+        }
+
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message ${type}`;
+            statusMessage.style.display = 'block';
+            
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 4000);
+        }
+
+        // Test de connexion à l'API au chargement
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch(`${API_BASE}/`);
+                if (response.ok) {
+                    showStatus('API connectée avec succès !', 'success');
+                } else {
+                    throw new Error('API non accessible');
+                }
+            } catch (error) {
+                showStatus('⚠️ Vérifiez l\'URL de votre API dans le code', 'error');
+                console.error('Erreur de connexion API:', error);
+            }
+        });
+    </script>
+</body>
+</html>
