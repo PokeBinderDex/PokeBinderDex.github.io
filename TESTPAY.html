@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>TESTPAY</title></head>
+<body>
+<h2 id="status">Vérification du paiement…</h2>
+
+<script>
+const SERVER_URL = "http://localhost:4242";
+const params = new URLSearchParams(window.location.search);
+const token = params.get("access_token");
+
+async function checkAccess() {
+  if (!token) {
+    document.getElementById("status").textContent = "Accès refusé ❌";
+    return;
+  }
+  const r = await fetch(`${SERVER_URL}/validate-token?token=${token}`);
+  const j = await r.json();
+  if (j.valid) {
+    document.getElementById("status").textContent = "Paiement validé ✅";
+    // Ici ton interface pour appeler ton API Hugging Face
+  } else {
+    document.getElementById("status").textContent = "Accès refusé ❌";
+  }
+}
+checkAccess();
+</script>
+</body>
+</html>
