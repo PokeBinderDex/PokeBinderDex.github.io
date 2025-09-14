@@ -61,19 +61,18 @@
             align-items: start;
         }
 
-        .preview-section {
+        .preview-section, .payment-section {
             background: white;
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .preview-section {
             animation: fadeInLeft 1s ease-out;
         }
 
         .payment-section {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             animation: fadeInRight 1s ease-out;
             position: sticky;
             top: 20px;
@@ -90,8 +89,7 @@
 
         .preview-image {
             width: 100%;
-            height: 300px;
-            background: #f7fafc;
+            /* hauteur auto selon image */
             border: 2px solid #e2e8f0;
             border-radius: 12px;
             overflow: hidden;
@@ -100,9 +98,13 @@
 
         .preview-image img {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            height: auto; /* hauteur auto selon l'image */
+            object-fit: contain;
+            object-position: center;
+            display: block;
         }
+
+
 
         .features-list {
             list-style: none;
@@ -127,11 +129,13 @@
             width: 20px;
         }
 
-        .style-preview {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin: 20px 0;
+        .style-sample img {
+            width: 100%;
+            height: auto; /* hauteur auto */
+            object-fit: contain;
+            object-position: center;
+            display: block;
+            background: #f7fafc;
         }
 
         .style-sample {
@@ -139,7 +143,15 @@
             border-radius: 12px;
             overflow: hidden;
             background: white;
+            padding: 10px; /* un peu d'espace autour de l'image */
         }
+
+        /* Pour garder la grille agréable */
+        .style-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+}
 
         .style-sample h4 {
             color: #4a5568;
@@ -151,12 +163,7 @@
             border-bottom: 1px solid #e2e8f0;
         }
 
-        .style-sample img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            display: block;
-        }
+   
 
         .payment-form {
             margin-bottom: 20px;
@@ -212,21 +219,14 @@
             font-size: 18px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
         }
 
-        .pay-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(72, 187, 120, 0.3);
-        }
-
         .pay-btn:disabled {
             opacity: 0.7;
-            transform: none;
             cursor: not-allowed;
         }
 
@@ -261,38 +261,13 @@
             border: 1px solid #feb2b2; 
         }
 
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeInLeft {
-            from { opacity: 0; transform: translateX(-30px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        @keyframes fadeInRight {
-            from { opacity: 0; transform: translateX(30px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
         @media (max-width: 768px) {
             .main-content {
                 grid-template-columns: 1fr;
                 gap: 20px;
             }
-            
-            .payment-section {
-                position: static;
-            }
-            
-            .header h1 {
-                font-size: 2em;
-            }
-            
-            .style-preview {
-                grid-template-columns: 1fr;
-            }
+            .payment-section { position: static; }
+            .style-preview { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -306,13 +281,10 @@
 
         <div class="main-content">
             <div class="preview-section">
-                <h2 class="section-title">
-                    <i class="fas fa-eye"></i>
-                    Tool Preview
-                </h2>
+                <h2 class="section-title"><i class="fas fa-eye"></i> Tool Preview</h2>
 
                 <div class="preview-image">
-                    <img src="assets/perso/global_exemple.png" alt="PDF Generation Interface - Search, select, and generate in just a few clicks">
+                    <img src="assets/perso/global_exemple.png" alt="PDF Generation Interface">
                 </div>
 
                 <h3 style="color: #4a5568; margin-bottom: 15px;">Included Features:</h3>
@@ -345,10 +317,7 @@
             </div>
 
             <div class="payment-section">
-                <h2 class="section-title">
-                    <i class="fas fa-credit-card"></i>
-                    Premium Access
-                </h2>
+                <h2 class="section-title"><i class="fas fa-credit-card"></i> Premium Access</h2>
 
                 <div class="price-summary">
                     <div class="total">
@@ -365,14 +334,11 @@
                 </div>
 
                 <button class="pay-btn" id="payBtn">
-                    <i class="fas fa-lock"></i>
-                    Pay $2.85 - Instant Access
+                    <i class="fas fa-lock"></i> Pay $2.85 - Instant Access
                 </button>
 
                 <div class="security-info">
-                    <i class="fas fa-shield-alt"></i>
-                    100% secure payment with Stripe
-                    <br>Instant access after validation
+                    <i class="fas fa-shield-alt"></i> 100% secure payment with Stripe
                 </div>
 
                 <div id="message"></div>
@@ -382,21 +348,14 @@
 
     <script src="https://js.stripe.com/v3/"></script>
     <script>
-        // Stripe public key
         const stripe = Stripe("pk_test_51S7Goh4KJAy57ttRX7Xi0c2jri9BrsRdZm3EjU244EyGB5CkLWPsigqMEXDRyKQAZVeUwSIDoyxdy3BgobhjzbaQ00Hc9vUecJ");
-        // Your Render server
         const SERVER_URL = "https://serverpps-5wfx.onrender.com";
         const messageDiv = document.getElementById('message');
 
-        // Payment button
         document.getElementById("payBtn").addEventListener("click", async () => {
             const email = document.getElementById("email").value.trim();
-            if (!email) {
-                showMessage("Please enter a valid email address", "error");
-                return;
-            }
+            if (!email) { showMessage("Please enter a valid email address", "error"); return; }
 
-            // Disable button during processing
             const payBtn = document.getElementById("payBtn");
             payBtn.disabled = true;
             payBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirecting to Stripe...';
@@ -407,26 +366,18 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email })
                 });
-                
                 const j = await r.json();
-                
-                if (j.id) {
-                    await stripe.redirectToCheckout({ sessionId: j.id });
-                } else {
-                    showMessage('Error creating payment session', 'error');
-                    console.error(j);
-                }
+                if (j.id) await stripe.redirectToCheckout({ sessionId: j.id });
+                else { showMessage('Error creating payment session', 'error'); console.error(j); }
             } catch (err) {
                 console.error('Error fetch create-checkout-session:', err);
                 showMessage('Server connection error', 'error');
             } finally {
-                // Re-enable button
                 payBtn.disabled = false;
                 payBtn.innerHTML = '<i class="fas fa-lock"></i> Pay $2.85 - Instant Access';
             }
         });
 
-        // Token verification after Stripe redirect
         async function checkToken(token) {
             try {
                 const r = await fetch(`${SERVER_URL}/validate-token?token=${token}`);
@@ -438,35 +389,23 @@
             }
         }
 
-        // Function to display messages
         function showMessage(text, type) {
             messageDiv.textContent = text;
             messageDiv.className = type;
             messageDiv.style.display = 'block';
-            
-            setTimeout(() => {
-                messageDiv.style.display = 'none';
-            }, 5000);
+            setTimeout(() => { messageDiv.style.display = 'none'; }, 5000);
         }
 
-        // If we arrive on the page with access_token
         (async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get('access_token');
-            
             if (token) {
                 showMessage("Verifying payment...", "success");
                 const valid = await checkToken(token);
-                
                 if (valid) {
                     showMessage("Payment validated! Redirecting to the tool...", "success");
-                    // Redirect to tool after 2 seconds
-                    setTimeout(() => {
-                        window.location.href = `personaliseddex.html?access_token=${token}`;
-                    }, 2000);
-                } else {
-                    showMessage("Payment not validated or expired", "error");
-                }
+                    setTimeout(() => { window.location.href = `personaliseddex.html?access_token=${token}`; }, 2000);
+                } else showMessage("Payment not validated or expired", "error");
             }
         })();
     </script>
