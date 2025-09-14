@@ -4,7 +4,7 @@
 <html>
 <head><meta charset="utf-8"><title>Payer</title></head>
 <body>
-  <h2>Payer pour accéder au Pokédex</h2>
+  <h2>Payer au Pokédex</h2>
 
   <label for="email">Votre email :</label>
   <input type="email" id="email" placeholder="email@example.com" required>
@@ -13,7 +13,7 @@
   <script src="https://js.stripe.com/v3/"></script>
   <script>
     const stripe = Stripe("pk_test_51S7Goh4KJAy57ttRX7Xi0c2jri9BrsRdZm3EjU244EyGB5CkLWPsigqMEXDRyKQAZVeUwSIDoyxdy3BgobhjzbaQ00Hc9vUecJ"); // ta clé publique
-    const SERVER_URL = "https://serverpps-5wfx.onrender.com";/ remplace par ton Space URL
+    const SERVER_URL = "https://serverpps-5wfx.onrender.com";
 
     document.getElementById("payBtn").addEventListener("click", async () => {
       const email = document.getElementById("email").value.trim();
