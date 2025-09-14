@@ -1,20 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Publicité OnClick</title>
+    <title>Test Pop Banner</title>
 </head>
 <body>
-    <h1>Page de test</h1>
-    <p>Clique sur le bouton pour charger la publicité :</p>
-    <button id="loadAd">Afficher la pub</button>
+    <h1>Test Pop Banner</h1>
+    <button id="showAd">Afficher la pub</button>
 
     <script>
-        document.getElementById('loadAd').addEventListener('click', () => {
+        document.getElementById('showAd').addEventListener('click', () => {
             const script = document.createElement('script');
-            script.dataset.zone = '9873601';
-            script.src = 'https://al5sm.com/tag.min.js';
+            script.dataset.zone = '9873669';
+            script.src = 'https://gizokraijaw.net/vignette.min.js';
             document.body.appendChild(script);
         });
     </script>
