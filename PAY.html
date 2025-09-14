@@ -1,20 +1,41 @@
 <!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"><title>Payer</title></head>
+<head>
+  <meta charset="utf-8">
+  <title>Payer</title>
+</head>
 <body>
-<h2>TEST</h2>
-<button id="payBtn">Payer 5€</button>
+  <h2>Payer pour accéder au Pokédex</h2>
 
-<script src="https://js.stripe.com/v3/"></script>
-<script>
-const stripe = Stripe("pk_test_51S7Goh4KJAy57ttRX7Xi0c2jri9BrsRdZm3EjU244EyGB5CkLWPsigqMEXDRyKQAZVeUwSIDoyxdy3BgobhjzbaQ00Hc9vUecJ"); // ta clé publique
-const SERVER_URL = "http://localhost:4242";
+  <label for="email">Votre email :</label>
+  <input type="email" id="email" placeholder="email@example.com" required>
+  <button id="payBtn">Payer 5€</button>
 
-document.getElementById("payBtn").addEventListener("click", async () => {
-  const r = await fetch(`${SERVER_URL}/create-checkout-session`, { method: 'POST' });
-  const data = await r.json();
-  stripe.redirectToCheckout({ sessionId: data.id });
-});
-</script>
+  <script src="https://js.stripe.com/v3/"></script>
+  <script>
+    const stripe = Stripe("pk_test_51S7Goh4KJAy57ttRX7Xi0c2jri9BrsRdZm3EjU244EyGB5CkLWPsigqMEXDRyKQAZVeUwSIDoyxdy3BgobhjzbaQ00Hc9vUecJ"); // ta clé publique
+    const SERVER_URL = "http://localhost:4242";
+
+    document.getElementById("payBtn").addEventListener("click", async () => {
+      const email = document.getElementById("email").value.trim();
+      if (!email) {
+        alert("Veuillez renseigner votre email !");
+        return;
+      }
+
+      const response = await fetch(`${SERVER_URL}/create-checkout-session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })  // envoie l'email au serveur
+      });
+
+      const data = await response.json();
+      if (data.id) {
+        stripe.redirectToCheckout({ sessionId: data.id });
+      } else {
+        alert("Erreur lors de la création de la session Stripe.");
+      }
+    });
+  </script>
 </body>
 </html>
