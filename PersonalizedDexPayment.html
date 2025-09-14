@@ -1,78 +1,527 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Payer au Pokédex</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Pokemon PDF Generator - PokéBinderDex</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .price-tag {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1.5em;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .preview-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            animation: fadeInLeft 1s ease-out;
+        }
+
+        .payment-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            animation: fadeInRight 1s ease-out;
+            position: sticky;
+            top: 20px;
+        }
+
+        .section-title {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .preview-image {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border: 2px dashed #cbd5e0;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-placeholder {
+            text-align: center;
+            color: #a0aec0;
+            font-size: 1.1em;
+        }
+
+        .features-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .features-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #4a5568;
+        }
+
+        .features-list li:last-child {
+            border-bottom: none;
+        }
+
+        .features-list i {
+            color: #48bb78;
+            width: 20px;
+        }
+
+        .style-preview {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .style-sample {
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            text-align: center;
+            background: #f7fafc;
+        }
+
+        .style-sample h4 {
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .style-sample .sample-box {
+            height: 60px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .sample-black { background: #000; }
+        .sample-outline { background: white; border: 2px solid #333; color: #333; }
+        .sample-light { background: white; border: 1px solid #999; color: #999; }
+        .sample-ultralight { background: white; border: 1px solid #ccc; color: #ccc; }
+
+        .payment-form {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .price-summary {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .price-summary .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .price-summary .total {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #4a5568;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 10px;
+        }
+
+        .pay-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .pay-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(72, 187, 120, 0.3);
+        }
+
+        .security-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #e6fffa;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #234e52;
+        }
+
+        .testimonial {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .testimonial p {
+            color: #4a5568;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
+        .testimonial .author {
+            color: #718096;
+            font-size: 0.9em;
+        }
+
+        #message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+
+        .success { background: #f0fff4; color: #276749; border: 1px solid #9ae6b4; }
+        .error { background: #fed7d7; color: #c53030; border: 1px solid #feb2b2; }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .payment-section {
+                position: static;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .style-preview {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h2>Payer pour accéder au Pokédex</h2>
+    <div class="container">
+        <div class="header">
+            <h1>Premium Pokemon PDF Generator</h1>
+            <p>Create custom PDFs of your favorite Pokemon</p>
+            <div class="price-tag">Only $2.85</div>
+        </div>
 
-  <label for="email">Votre email :</label>
-  <input type="email" id="email" placeholder="email@example.com" required>
-  <button id="payBtn">Payer 5€</button>
+        <div class="main-content">
+            <div class="preview-section">
+                <h2 class="section-title">
+                    <i class="fas fa-eye"></i>
+                    Tool Preview
+                </h2>
 
-  <div id="message" style="margin-top:20px; font-weight:bold;"></div>
+                <div class="preview-image">
+                    <div class="preview-placeholder">
+                        <i class="fas fa-image" style="font-size: 3em; margin-bottom: 10px; color: #cbd5e0;"></i>
+                        <p>PDF Generation Interface</p>
+                        <small>Search, select, and generate in just a few clicks</small>
+                    </div>
+                </div>
 
-  <script src="https://js.stripe.com/v3/"></script>
-  <script>
-    // Clé publique Stripe
-    const stripe = Stripe("pk_test_51S7Goh4KJAy57ttRX7Xi0c2jri9BrsRdZm3EjU244EyGB5CkLWPsigqMEXDRyKQAZVeUwSIDoyxdy3BgobhjzbaQ00Hc9vUecJ");
+                <h3 style="color: #4a5568; margin-bottom: 15px;">Included Features:</h3>
+                <ul class="features-list">
+                    <li><i class="fas fa-search"></i> Advanced search by name or number</li>
+                    <li><i class="fas fa-list"></i> Complete generation selection (Gen 1-8)</li>
+                    <li><i class="fas fa-copy"></i> Bulk import with number lists</li>
+                    <li><i class="fas fa-palette"></i> 4 different rendering styles</li>
+                    <li><i class="fas fa-file-pdf"></i> High-quality PDF export</li>
+                    <li><i class="fas fa-mobile-alt"></i> Mobile responsive interface</li>
+                    <li><i class="fas fa-infinity"></i> Unlimited lifetime usage</li>
+                    <li><i class="fas fa-camera"></i> Compatible with our Binder Scanner</li>
+                </ul>
 
-    // Ton serveur Render
-    const SERVER_URL = "https://serverpps-5wfx.onrender.com";
+                <h3 style="color: #4a5568; margin: 25px 0 15px;">Available Rendering Styles:</h3>
+                <div class="style-preview">
+                    <div class="style-sample">
+                        <h4>Black Silhouettes</h4>
+                        <div class="sample-box sample-black">POKEMON</div>
+                    </div>
+                    <div class="style-sample">
+                        <h4>Outlines</h4>
+                        <div class="sample-box sample-outline">POKEMON</div>
+                    </div>
+                    <div class="style-sample">
+                        <h4>Light Outlines</h4>
+                        <div class="sample-box sample-light">POKEMON</div>
+                    </div>
+                    <div class="style-sample">
+                        <h4>Ultra Light</h4>
+                        <div class="sample-box sample-ultralight">POKEMON</div>
+                    </div>
+                </div>
 
-    const messageDiv = document.getElementById('message');
+                <div class="testimonial">
+                    <p>"Exactly what I was looking for to organize my collection! The interface is super intuitive and the PDFs are perfect."</p>
+                    <div class="author">— Sarah, collector for 15 years</div>
+                </div>
 
-    // Bouton paiement
-    document.getElementById("payBtn").addEventListener("click", async () => {
-      const email = document.getElementById("email").value.trim();
-      if (!email) return alert("Renseigne un email valide");
+                <h3 style="color: #4a5568; margin: 25px 0 15px;">Use Cases:</h3>
+                <ul class="features-list">
+                    <li><i class="fas fa-book"></i> Create missing card checklists</li>
+                    <li><i class="fas fa-print"></i> Print collection sheets</li>
+                    <li><i class="fas fa-share"></i> Share wishlist with friends</li>
+                    <li><i class="fas fa-organize"></i> Organize your trades</li>
+                </ul>
+            </div>
 
-      try {
-        const r = await fetch(`${SERVER_URL}/create-checkout-session`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email })
+            <div class="payment-section">
+                <h2 class="section-title">
+                    <i class="fas fa-credit-card"></i>
+                    Premium Access
+                </h2>
+
+                <div class="price-summary">
+                    <div class="price-row">
+                        <span>Pokemon PDF Generator</span>
+                        <span>$2.40</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Tax (20%)</span>
+                        <span>$0.45</span>
+                    </div>
+                    <div class="price-row total">
+                        <span>Total</span>
+                        <span>$2.85</span>
+                    </div>
+                </div>
+
+                <div class="payment-form">
+                    <div class="form-group">
+                        <label for="email">Your Email:</label>
+                        <input type="email" id="email" placeholder="your@email.com" required>
+                    </div>
+                </div>
+
+                <button class="pay-btn" id="payBtn">
+                    <i class="fas fa-lock"></i>
+                    Pay $2.85 - Instant Access
+                </button>
+
+                <div class="security-info">
+                    <i class="fas fa-shield-alt"></i>
+                    100% secure payment with Stripe
+                    <br>Instant access after validation
+                </div>
+
+                <div id="message"></div>
+
+                <div style="margin-top: 20px; padding: 15px; background: #fff5f5; border-radius: 8px; font-size: 0.9em; color: #718096;">
+                    <p><strong>Refund Policy:</strong> Satisfied or money back within 7 days. Contact us if you have any issues.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        // Stripe public key
+        const stripe = Stripe("pk_test_51S7Goh4KJAy57ttRX7Xi0c2jri9BrsRdZm3EjU244EyGB5CkLWPsigqMEXDRyKQAZVeUwSIDoyxdy3BgobhjzbaQ00Hc9vUecJ");
+        // Your Render server
+        const SERVER_URL = "https://serverpps-5wfx.onrender.com";
+        const messageDiv = document.getElementById('message');
+
+        // Payment button
+        document.getElementById("payBtn").addEventListener("click", async () => {
+            const email = document.getElementById("email").value.trim();
+            if (!email) {
+                showMessage("Please enter a valid email address", "error");
+                return;
+            }
+
+            // Disable button during processing
+            const payBtn = document.getElementById("payBtn");
+            payBtn.disabled = true;
+            payBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirecting to Stripe...';
+
+            try {
+                const r = await fetch(`${SERVER_URL}/create-checkout-session`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                
+                const j = await r.json();
+                
+                if (j.id) {
+                    await stripe.redirectToCheckout({ sessionId: j.id });
+                } else {
+                    showMessage('Error creating payment session', 'error');
+                    console.error(j);
+                }
+            } catch (err) {
+                console.error('Error fetch create-checkout-session:', err);
+                showMessage('Server connection error', 'error');
+            } finally {
+                // Re-enable button
+                payBtn.disabled = false;
+                payBtn.innerHTML = '<i class="fas fa-lock"></i> Pay $2.85 - Instant Access';
+            }
         });
-        const j = await r.json();
-        if (j.id) {
-          await stripe.redirectToCheckout({ sessionId: j.id });
-        } else {
-          alert('Erreur création session');
-          console.error(j);
-        }
-      } catch (err) {
-        console.error('Erreur fetch create-checkout-session:', err);
-        alert('Erreur serveur');
-      }
-    });
 
-    // Vérification du token après redirection Stripe
-    async function checkToken(token) {
-      try {
-        const r = await fetch(`${SERVER_URL}/validate-token?token=${token}`);
-        const j = await r.json();
-        return j.valid;
-      } catch (err) {
-        console.error('Erreur fetch validate-token:', err);
-        return false;
-      }
-    }
-
-    // Si on arrive sur la page avec access_token
-    (async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get('access_token');
-      if (token) {
-        messageDiv.innerText = "Vérification du paiement…";
-        const valid = await checkToken(token);
-        if (valid) {
-          messageDiv.innerHTML = "✅ Paiement validé ! Accès au Pokédex accordé 🎉";
-        } else {
-          messageDiv.innerHTML = "❌ Paiement non validé ou expiré";
+        // Token verification after Stripe redirect
+        async function checkToken(token) {
+            try {
+                const r = await fetch(`${SERVER_URL}/validate-token?token=${token}`);
+                const j = await r.json();
+                return j.valid;
+            } catch (err) {
+                console.error('Error fetch validate-token:', err);
+                return false;
+            }
         }
-      }
-    })();
-  </script>
+
+        // Function to display messages
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = type;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // If we arrive on the page with access_token
+        (async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('access_token');
+            
+            if (token) {
+                showMessage("Verifying payment...", "success");
+                const valid = await checkToken(token);
+                
+                if (valid) {
+                    showMessage("Payment validated! Redirecting to the tool...", "success");
+                    // Redirect to tool after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = `personaliseddex.html?access_token=${token}`;
+                    }, 2000);
+                } else {
+                    showMessage("Payment not validated or expired", "error");
+                }
+            }
+        })();
+    </script>
 </body>
 </html>
