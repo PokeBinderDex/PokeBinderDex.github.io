@@ -1,33 +1,33 @@
-
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-
+  <meta charset="UTF-8">
+  <title>Test Pub PropellerAds</title>
 </head>
 <body>
-<header> 
-    TEST
-<button id="scannerBtn">Test</button>
-<script src="https://example-propellerads-code.js"></script>
+
+<button id="scannerBtn">Scanner</button>
+
+<!-- 🔑 PropellerAds Interstitial Tag -->
+<script async src="https://upgulpinon.com/1?z=XXXXX"></script> 
+<!-- Remplace XXXXX par TON ID/ZONE de PropellerAds -->
+
 <script>
-  document.getElementById("scannerBtn").addEventListener("click", function() {
-    // Lance la pub
-    if (typeof propellerAdsInterstitial !== "undefined") {
-      propellerAdsInterstitial.show();
+  document.getElementById("scannerBtn").addEventListener("click", function () {
+    // Si le script PropellerAds est chargé, la pub se lancera
+    if (typeof propellerAds === "undefined") {
+      console.log("PropellerAds pas encore prêt");
     }
-    // Ensuite lance ton scanner (avec un petit délai)
-    setTimeout(() => lancerScanner(), 3000);
+    // ⚠ L'interstitial se déclenche automatiquement sur user click
+    // donc rien de plus à faire, juste lancer ton scanner après un délai
+    setTimeout(() => lancerScanner(), 4000); 
   });
 
   function lancerScanner() {
     console.log("Scan en cours...");
-    // ton code de scanner ici
+    // Ton code de scanner ici
   }
 </script>
-
-    </header> 
-Test
 
 </body>
 </html>
