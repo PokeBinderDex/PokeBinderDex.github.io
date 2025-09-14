@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎨 Générateur de PDF Pokémon</title>
+    <title>Pokemon PDF Generator</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -357,70 +357,85 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎨 Générateur de PDF Pokémon</h1>
-            <p>Créez des PDFs de cartes Pokémon personnalisés en quelques clics !</p>
+            <h1>Pokemon PDF Generator</h1>
+            <p>Create custom Pokemon card PDFs in just a few clicks!</p>
         </div>
 
         <div class="main-card">
-            <!-- Section Recherche -->
+            <!-- Search Section -->
             <div class="section">
-                <h2><i class="fas fa-search"></i> Recherche de Pokémon</h2>
+                <h2><i class="fas fa-search"></i> Pokemon Search</h2>
                 <div class="search-container">
                     <input 
                         type="text" 
                         class="search-input" 
                         id="searchInput"
-                        placeholder="Tapez un nom ou numéro (ex: Pikachu, 25)"
+                        placeholder="Type name or number (e.g. Pikachu, 25)"
                     >
                     <div class="search-results" id="searchResults"></div>
                 </div>
                 
-                <!-- Sélection rapide -->
+                <!-- Bulk Selection -->
                 <div class="quick-select">
-                    <h3 style="margin-bottom: 10px; color: #4a5568;">Sélection rapide :</h3>
+                    <h3 style="margin-bottom: 10px; color: #4a5568;">Bulk Selection:</h3>
+                    <textarea 
+                        id="bulkInput" 
+                        placeholder="Paste Pokemon numbers separated by commas (e.g. 001, 025, 150, 249)" 
+                        style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; resize: vertical; min-height: 60px; margin-bottom: 10px;"
+                    ></textarea>
+                    <button class="quick-btn" onclick="processBulkSelection()">Add from List</button>
+                </div>
+                
+                <!-- Generation Selection -->
+                <div class="quick-select">
+                    <h3 style="margin-bottom: 10px; color: #4a5568;">Quick Selection:</h3>
                     <div class="quick-buttons">
-                        <button class="quick-btn" onclick="addQuickSelection('1,4,7')">Starters Kanto</button>
-                        <button class="quick-btn" onclick="addQuickSelection('25,26')">Pikachu & Raichu</button>
-                        <button class="quick-btn" onclick="addQuickSelection('150,151,149')">Légendaires</button>
-                        <button class="quick-btn" onclick="addQuickSelection('1,2,3,4,5,6,7,8,9')">Top 9</button>
-                        <button class="quick-btn" onclick="clearSelection()">Vider</button>
+                        <button class="quick-btn" onclick="addGeneration(1)">Gen I (1-151)</button>
+                        <button class="quick-btn" onclick="addGeneration(2)">Gen II (152-251)</button>
+                        <button class="quick-btn" onclick="addGeneration(3)">Gen III (252-386)</button>
+                        <button class="quick-btn" onclick="addGeneration(4)">Gen IV (387-493)</button>
+                        <button class="quick-btn" onclick="addGeneration(5)">Gen V (494-649)</button>
+                        <button class="quick-btn" onclick="addGeneration(6)">Gen VI (650-721)</button>
+                        <button class="quick-btn" onclick="addGeneration(7)">Gen VII (722-809)</button>
+                        <button class="quick-btn" onclick="addGeneration(8)">Gen VIII (810-905)</button>
+                        <button class="quick-btn" onclick="clearSelection()">Clear</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Section Sélection -->
+            <!-- Selection Section -->
             <div class="section">
-                <h2><i class="fas fa-star"></i> Pokémon Sélectionnés (<span id="pokemonCount">0</span>)</h2>
+                <h2><i class="fas fa-star"></i> Selected Pokemon (<span id="pokemonCount">0</span>)</h2>
                 <div class="selected-pokemon" id="selectedPokemon">
-                    <div class="empty-state">Aucun Pokémon sélectionné. Utilisez la recherche ci-dessus.</div>
+                    <div class="empty-state">No Pokemon selected. Use the search above or bulk selection.</div>
                 </div>
             </div>
 
-            <!-- Section Style -->
+            <!-- Style Section -->
             <div class="section">
-                <h2><i class="fas fa-palette"></i> Style de Génération</h2>
+                <h2><i class="fas fa-palette"></i> Generation Style</h2>
                 <div class="style-selector">
                     <div class="style-option selected" data-style="black">
-                        <h3>🖤 Silhouettes Noires</h3>
-                        <p>Pokémon entièrement noirs sur fond blanc</p>
+                        <h3>Black Silhouettes</h3>
+                        <p>Pokemon entirely black on white background</p>
                     </div>
                     <div class="style-option" data-style="outline">
-                        <h3>🔲 Contours Uniquement</h3>
-                        <p>Juste les contours des Pokémon</p>
+                        <h3>Outline Only</h3>
+                        <p>Just the outlines of Pokemon</p>
                     </div>
                     <div class="style-option" data-style="ultralight">
-                        <h3>💫 Ultra Léger</h3>
-                        <p>Contours discrets en gris</p>
+                        <h3>Ultra Light</h3>
+                        <p>Subtle gray outlines</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Section Génération -->
+            <!-- Generation Section -->
             <div class="section">
                 <button class="generate-btn" id="generateBtn">
                     <i class="fas fa-spinner loading" id="loadingIcon"></i>
                     <i class="fas fa-file-pdf"></i>
-                    Générer le PDF
+                    Generate PDF
                 </button>
                 <div class="status-message" id="statusMessage"></div>
             </div>
@@ -428,7 +443,7 @@
     </div>
 
     <script>
-        // Configuration de l'API - CHANGEZ CETTE URL PAR CELLE DE VOTRE SPACE
+        // Configuration de l'API
         const API_BASE = 'https://leonheart2b-personaliseddex.hf.space';
         
         // État global
@@ -489,14 +504,14 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error('Erreur de recherche');
+                    throw new Error('Search error');
                 }
 
                 const data = await response.json();
                 displaySearchResults(data.results);
             } catch (error) {
-                console.error('Erreur de recherche:', error);
-                showStatus('Erreur lors de la recherche', 'error');
+                console.error('Search error:', error);
+                showStatus('Error during search', 'error');
             }
         }
 
@@ -546,13 +561,111 @@
             searchResults.style.display = 'none';
         }
 
-        // Fonctions de gestion des Pokémon sélectionnés
+        // Bulk Selection Function
+        function processBulkSelection() {
+            const bulkText = document.getElementById('bulkInput').value;
+            if (!bulkText.trim()) {
+                showStatus('Please enter Pokemon numbers', 'error');
+                return;
+            }
+
+            const numbers = bulkText.split(',').map(n => n.trim()).filter(n => n);
+            let addedCount = 0;
+
+            numbers.forEach(async (numStr) => {
+                // Handle both formats: "001" and "1" 
+                let number;
+                if (numStr.match(/^\d{1,3}$/)) {
+                    number = parseInt(numStr);
+                } else {
+                    return; // Skip invalid formats
+                }
+
+                // Avoid duplicates
+                if (selectedPokemon.some(p => parseInt(p.number) === number)) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${API_BASE}/pokemon/${number}`);
+                    if (response.ok) {
+                        const pokemon = await response.json();
+                        selectedPokemon.push(pokemon);
+                        addedCount++;
+                        updateSelectedDisplay();
+                    }
+                } catch (error) {
+                    console.error(`Error for Pokemon ${number}:`, error);
+                }
+            });
+
+            setTimeout(() => {
+                if (addedCount > 0) {
+                    showStatus(`${addedCount} Pokemon added from list!`, 'success');
+                    document.getElementById('bulkInput').value = '';
+                } else {
+                    showStatus('No valid Pokemon found in the list', 'error');
+                }
+            }, 500);
+        }
+
+        // Generation Selection Functions
+        const generationRanges = {
+            1: [1, 151],
+            2: [152, 251], 
+            3: [252, 386],
+            4: [387, 493],
+            5: [494, 649],
+            6: [650, 721],
+            7: [722, 809],
+            8: [810, 905]
+        };
+
+        function addGeneration(gen) {
+            const [start, end] = generationRanges[gen];
+            let addedCount = 0;
+            
+            for (let i = start; i <= end; i++) {
+                // Avoid duplicates
+                if (selectedPokemon.some(p => parseInt(p.number) === i)) {
+                    continue;
+                }
+
+                fetch(`${API_BASE}/pokemon/${i}`)
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                        throw new Error('Pokemon not found');
+                    })
+                    .then(pokemon => {
+                        selectedPokemon.push(pokemon);
+                        addedCount++;
+                        updateSelectedDisplay();
+                    })
+                    .catch(error => {
+                        // Silently skip missing Pokemon
+                    });
+            }
+
+            setTimeout(() => {
+                showStatus(`Generation ${gen} Pokemon added!`, 'success');
+            }, 1000);
+        }
+
+        function clearSelection() {
+            selectedPokemon = [];
+            updateSelectedDisplay();
+            showStatus('Selection cleared', 'success');
+        }
+
+        // Functions for managing selected Pokemon
         function addPokemon(pokemon) {
             const pokemonNumber = parseInt(pokemon.number);
             
-            // Éviter les doublons
+            // Avoid duplicates
             if (selectedPokemon.some(p => parseInt(p.number) === pokemonNumber)) {
-                showStatus('Ce Pokémon est déjà sélectionné', 'error');
+                showStatus('This Pokemon is already selected', 'error');
                 hideSearchResults();
                 return;
             }
@@ -561,20 +674,20 @@
             updateSelectedDisplay();
             hideSearchResults();
             searchInput.value = '';
-            showStatus(`${pokemon.name} ajouté !`, 'success');
+            showStatus(`${pokemon.name} added!`, 'success');
         }
 
         function removePokemon(number) {
             selectedPokemon = selectedPokemon.filter(p => parseInt(p.number) !== parseInt(number));
             updateSelectedDisplay();
-            showStatus('Pokémon retiré', 'success');
+            showStatus('Pokemon removed', 'success');
         }
 
         function updateSelectedDisplay() {
             pokemonCount.textContent = selectedPokemon.length;
             
             if (selectedPokemon.length === 0) {
-                selectedContainer.innerHTML = '<div class="empty-state">Aucun Pokémon sélectionné. Utilisez la recherche ci-dessus.</div>';
+                selectedContainer.innerHTML = '<div class="empty-state">No Pokemon selected. Use the search above or bulk selection.</div>';
                 return;
             }
 
@@ -586,41 +699,10 @@
             `).join('');
         }
 
-        // Fonctions de sélection rapide
-        function addQuickSelection(numbers) {
-            const numbersList = numbers.split(',');
-            
-            numbersList.forEach(async (num) => {
-                const number = parseInt(num.trim());
-                
-                // Éviter les doublons
-                if (selectedPokemon.some(p => parseInt(p.number) === number)) {
-                    return;
-                }
-
-                try {
-                    const response = await fetch(`${API_BASE}/pokemon/${number}`);
-                    if (response.ok) {
-                        const pokemon = await response.json();
-                        selectedPokemon.push(pokemon);
-                        updateSelectedDisplay();
-                    }
-                } catch (error) {
-                    console.error(`Erreur pour le Pokémon ${number}:`, error);
-                }
-            });
-        }
-
-        function clearSelection() {
-            selectedPokemon = [];
-            updateSelectedDisplay();
-            showStatus('Sélection vidée', 'success');
-        }
-
-        // Fonction de génération PDF
+        // PDF Generation Function
         async function generatePDF() {
             if (selectedPokemon.length === 0) {
-                showStatus('Veuillez sélectionner au moins un Pokémon', 'error');
+                showStatus('Please select at least one Pokemon', 'error');
                 return;
             }
 
@@ -642,10 +724,10 @@
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.detail || 'Erreur lors de la génération');
+                    throw new Error(errorData.detail || 'Error during generation');
                 }
 
-                // Télécharger le fichier PDF
+                // Download the PDF file
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -656,25 +738,25 @@
                 window.URL.revokeObjectURL(url);
                 document.body.removeChild(a);
 
-                showStatus(`PDF généré avec succès ! (${selectedPokemon.length} Pokémon)`, 'success');
+                showStatus(`PDF generated successfully! (${selectedPokemon.length} Pokemon)`, 'success');
             } catch (error) {
-                console.error('Erreur de génération:', error);
-                showStatus('Erreur lors de la génération du PDF: ' + error.message, 'error');
+                console.error('Generation error:', error);
+                showStatus('Error during PDF generation: ' + error.message, 'error');
             } finally {
                 setLoading(false);
             }
         }
 
-        // Fonctions utilitaires
+        // Utility Functions
         function setLoading(loading) {
             if (loading) {
                 generateBtn.disabled = true;
                 loadingIcon.classList.add('active');
-                generateBtn.innerHTML = '<i class="fas fa-spinner loading active"></i>Génération en cours...';
+                generateBtn.innerHTML = '<i class="fas fa-spinner loading active"></i>Generating...';
             } else {
                 generateBtn.disabled = false;
                 loadingIcon.classList.remove('active');
-                generateBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Générer le PDF';
+                generateBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Generate PDF';
             }
         }
 
@@ -688,18 +770,18 @@
             }, 4000);
         }
 
-        // Test de connexion à l'API au chargement
+        // API Connection Test
         window.addEventListener('load', async () => {
             try {
                 const response = await fetch(`${API_BASE}/`);
                 if (response.ok) {
-                    showStatus('API connectée avec succès !', 'success');
+                    showStatus('API connected successfully!', 'success');
                 } else {
-                    throw new Error('API non accessible');
+                    throw new Error('API not accessible');
                 }
             } catch (error) {
-                showStatus('⚠️ Vérifiez l\'URL de votre API dans le code', 'error');
-                console.error('Erreur de connexion API:', error);
+                showStatus('⚠️ Check your API URL in the code', 'error');
+                console.error('API connection error:', error);
             }
         });
     </script>
