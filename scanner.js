@@ -521,6 +521,24 @@ function displayResults(detectedPokemon, language) {
         </button>
     `;
     resultsList.appendChild(pdfButtonContainer);
+
+    // Add missing Pokemon copy button (add this after the PDF button container)
+    const missingCount = getMissingPokemonNumbers(detectedPokemon, language).length;
+    const copyButtonContainer = document.createElement('div');
+    copyButtonContainer.className = 'copy-missing-container';
+  copyButtonContainer.innerHTML = `
+    <button id="copyMissingBtn" class="copy-missing-btn">
+        📋 Copy Missing Pokemon (<strong><a href="https://pokebinderdex.github.io/PersonalizedDexPayment.html" target="_blank" style="color: inherit; text-decoration: underline;">Use for bulk in PersonalizedDex</a></strong>)
+    </button>
+    <span class="copy-missing-info">(${missingCount} missing)</span>
+`;
+
+    resultsList.appendChild(copyButtonContainer);
+
+    // Add event listener for copy button
+    document.getElementById('copyMissingBtn').addEventListener('click', () => {
+        copyMissingPokemon(detectedPokemon, language);
+    });
     
     // Add event listener for PDF download
     document.getElementById('downloadPdfBtn').addEventListener('click', () => {
@@ -1410,6 +1428,70 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 });
+
+
+// Function to get missing Pokemon numbers
+function getMissingPokemonNumbers(detectedPokemon, language) {
+    const pokedex = POKEDEX[language] || POKEDEX['en'];
+    const detectedNumbers = new Set();
+    
+    // Get all detected Pokemon numbers
+    detectedPokemon.forEach(pokemon => {
+        for (let i = 0; i < pokedex.length; i++) {
+            if (pokedex[i].toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === 
+                pokemon.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")) {
+                detectedNumbers.add(i + 1);
+                break;
+            }
+        }
+    });
+    
+    // Get missing Pokemon numbers (1 to 1025)
+    const missingNumbers = [];
+    for (let i = 1; i <= 1025; i++) {
+        if (!detectedNumbers.has(i)) {
+            missingNumbers.push(i.toString().padStart(3, '0'));
+        }
+    }
+    
+    return missingNumbers;
+}
+
+// Function to copy missing Pokemon list to clipboard
+async function copyMissingPokemon(detectedPokemon, language) {
+    const copyBtn = document.getElementById('copyMissingBtn');
+    const originalContent = copyBtn.innerHTML;
+    
+    try {
+        const missingNumbers = getMissingPokemonNumbers(detectedPokemon, language);
+        const missingList = missingNumbers.join(',');
+        
+        await navigator.clipboard.writeText(missingList);
+        
+        // Show success feedback
+        copyBtn.innerHTML = '✅ Copied!';
+        copyBtn.style.background = '#22c55e';
+        
+        setTimeout(() => {
+            copyBtn.innerHTML = originalContent;
+            copyBtn.style.background = '';
+        }, 2000);
+        
+    } catch (err) {
+        console.error('Failed to copy:', err);
+        
+        // Show error feedback
+        copyBtn.innerHTML = '❌ Error';
+        copyBtn.style.background = '#ef4444';
+        
+        setTimeout(() => {
+            copyBtn.innerHTML = originalContent;
+            copyBtn.style.background = '';
+        }, 2000);
+    }
+}
+
+
 
 
 // =======================================================================================
