@@ -36,6 +36,7 @@
             font-size: 2.5em;
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-top: 20px;
         }
 
         .header p {
@@ -323,6 +324,106 @@
     color: #4a5568;
     font-weight: 500;
 }
+
+
+
+        /* Scanner Beta Button - Version Responsive Améliorée */
+.home-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: linear-gradient(135deg, #ff7070, #ffd5d5);
+  color: white;
+  font-weight: bold;
+  padding: 8px 14px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+  white-space: nowrap;
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.home-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+  text-decoration: none;
+  color: white;
+}
+
+
+/* Media Queries pour la responsivité */
+
+/* Écrans moyens et petits (tablettes) */
+@media (max-width: 1200px) {
+  .home-btn {
+    top: 12px;
+    right: 15px;
+    padding: 7px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .beta-tag {
+    font-size: 0.65rem;
+    padding: 2px 5px;
+  }
+}
+
+/* Tablettes en mode portrait */
+@media (max-width: 992px) {
+  .home-btn {
+    top: 10px;
+    right: 15px;
+    padding: 6px 10px;
+    font-size: 0.75rem;
+    border-radius: 18px;
+  }
+  
+  .beta-tag {
+    font-size: 0.6rem;
+    padding: 1px 4px;
+  }
+}
+
+/* Smartphones et petits écrans */
+@media (max-width: 768px) {
+  .home-btn {
+    top: 5px;
+    right: 5px;
+    padding: 4px 6px;
+    font-size: 0.65rem;
+    border-radius: 12px;
+    min-width: 40px;
+    text-align: center;
+  }
+
+    /* Option : cacher le texte et ne garder qu'une icône sur très petits écrans */
+  .home-btn .home-text {
+    display: none;
+  }
+  
+  /* Ajout d'une icône si vous voulez remplacer le texte */
+  .home-btn::before {
+    content: "🏠";
+    font-size: 1rem;
+  }
+}
+
+
+
+
+
+/* Gestion du header container pour éviter les conflits */
+@media (max-width: 768px) {
+  .header-container {
+    position: relative;
+    padding-top: 50px; /* Espace pour le bouton scanner en position fixed */
+  }
+}
+
     </style>
 </head>
 <body>
@@ -331,6 +432,7 @@
             <h1>Premium Pokemon PDF Generator</h1>
             <p>Create custom PDFs of your favorite Pokemon</p>
             <div class="price-tag">Only $2.85</div>
+                 <a href="pokebinderdex.github.io" class="home-btn"><span class="home-text">🏠 PokeBinderDex</span> </a>
         </div>
 
         <div class="main-content">
