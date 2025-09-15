@@ -585,7 +585,31 @@
   }
 }
 
+.paste-btn {
+    background: linear-gradient(135deg, #2cade8, #0f72d0);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
 
+.paste-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 67, 185, 0.3);
+    background: linear-gradient(135deg, #3169a2, #082a50);
+}
+
+.paste-btn:active {
+    transform: translateY(0);
+}
 
 
 
@@ -651,14 +675,21 @@
                     <!-- Bulk Selection -->
                     <div class="quick-select">
                         <h3 style="margin-bottom: 10px; color: #4a5568;">Bulk Selection:</h3>
-                        <textarea 
-                            id="bulkInput" 
-                            placeholder="Paste Pokemon numbers separated by commas (e.g. 001, 025, 150, 249, 1020)" 
-                            style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; resize: vertical; min-height: 60px; margin-bottom: 10px;"
-                        ></textarea>
-                        <button class="quick-btn" onclick="processBulkSelection()">
-                            <i class="fas fa-plus"></i> Add from List
-                        </button>
+                        <div style="display: flex; gap: 10px; align-items: flex-start;">
+                            <textarea 
+                                id="bulkInput" 
+                                placeholder="Paste Pokemon numbers separated by commas (e.g. 001, 025, 150, 249, 1020)" 
+                                style="flex: 1; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; resize: vertical; min-height: 60px;"
+                            ></textarea>
+                            <button id="pasteBtn" class="paste-btn" onclick="pasteFromClipboard()" title="Paste from clipboard">
+                                📋
+                            </button>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <button class="quick-btn" onclick="processBulkSelection()">
+                                <i class="fas fa-plus"></i> Add from List
+                            </button>
+                        </div>
                     </div>
                     
                     <!-- Generation Selection -->
@@ -772,7 +803,7 @@
             }
         }
 
-        function showAccessGranted() {
+       function showAccessGranted() {
             accessGranted = true;
             accessStatus.className = 'access-status granted';
             accessStatus.innerHTML = `
@@ -784,7 +815,7 @@
                 appContent.classList.add('visible');
                 initializeApp();
             }, 1000);
-        }
+       }
 
         function showAccessDenied(reason) {
             accessStatus.className = 'access-status denied';
@@ -1148,8 +1179,150 @@
             }, 4000);
         }
 
+        function getMissingPokemonNumbers(detectedPokemon, language) {
+    const pokedex = POKEDEX[language] || POKEDEX['en'];
+    const detectedNumbers = new Set();
+    
+    // Get all detected Pokemon numbers
+    detectedPokemon.forEach(pokemon => {
+        for (let i = 0; i < pokedex.length; i++) {
+            if (pokedex[i].toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === 
+                pokemon.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")) {
+                detectedNumbers.add(i + 1);
+                break;
+            }
+        }
+    });
+    
+    // Get missing Pokemon numbers (1 to 1025)
+    const missingNumbers = [];
+    for (let i = 1; i <= 1025; i++) {
+        if (!detectedNumbers.has(i)) {
+            missingNumbers.push(i.toString().padStart(3, '0'));
+        }
+    }
+    
+    return missingNumbers;
+}
+
+// Function to copy missing Pokemon list to clipboard
+async function copyMissingPokemon(detectedPokemon, language) {
+    const copyBtn = document.getElementById('copyMissingBtn');
+    const originalContent = copyBtn.innerHTML;
+    
+    try {
+        const missingNumbers = getMissingPokemonNumbers(detectedPokemon, language);
+        const missingList = missingNumbers.join(',');
+        
+        // Try modern Clipboard API first
+        if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(missingList);
+        } else {
+            // Fallback for older browsers or insecure contexts
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.value = missingList;
+            tempTextarea.style.position = 'fixed';
+            tempTextarea.style.left = '-9999px';
+            tempTextarea.style.top = '-9999px';
+            document.body.appendChild(tempTextarea);
+            
+            tempTextarea.focus();
+            tempTextarea.select();
+            tempTextarea.setSelectionRange(0, 99999);
+            
+            const successful = document.execCommand('copy');
+            document.body.removeChild(tempTextarea);
+            
+            if (!successful) {
+                throw new Error('Copy command failed');
+            }
+        }
+        
+        // Show success feedback
+        copyBtn.innerHTML = '✅ Copied!';
+        copyBtn.style.background = '#22c55e';
+        
+        setTimeout(() => {
+            copyBtn.innerHTML = originalContent;
+            copyBtn.style.background = '';
+        }, 2000);
+        
+    } catch (err) {
+        console.error('Failed to copy:', err);
+        
+        // Show error feedback
+        copyBtn.innerHTML = '❌ Error';
+        copyBtn.style.background = '#ef4444';
+        
+        setTimeout(() => {
+            copyBtn.innerHTML = originalContent;
+            copyBtn.style.background = '';
+        }, 2000);
+    }
+}
+
+// Function to paste from clipboard into bulk input
+async function pasteFromClipboard() {
+    const pasteBtn = document.getElementById('pasteBtn');
+    const bulkInput = document.getElementById('bulkInput');
+    const originalContent = pasteBtn.innerHTML;
+    
+    try {
+        let clipboardText = '';
+        
+        // Try modern Clipboard API first
+        if (navigator.clipboard && window.isSecureContext) {
+            clipboardText = await navigator.clipboard.readText();
+        } else {
+            // For older browsers, we can't read clipboard automatically
+            // Show a message to user
+            pasteBtn.innerHTML = '💬 Ctrl+V';
+            pasteBtn.style.background = '#3b82f6';
+            bulkInput.focus();
+            
+            setTimeout(() => {
+                pasteBtn.innerHTML = originalContent;
+                pasteBtn.style.background = '';
+            }, 2000);
+            return;
+        }
+        
+        if (clipboardText.trim()) {
+            bulkInput.value = clipboardText.trim();
+            
+            // Show success feedback
+            pasteBtn.innerHTML = '✅';
+            pasteBtn.style.background = '#22c55e';
+            
+            setTimeout(() => {
+                pasteBtn.innerHTML = originalContent;
+                pasteBtn.style.background = '';
+            }, 2000);
+        } else {
+            throw new Error('Clipboard is empty');
+        }
+        
+    } catch (err) {
+        console.error('Failed to paste:', err);
+        
+        // Show error feedback or instruction
+        pasteBtn.innerHTML = 'X';
+        pasteBtn.style.background = '#f59e0b';
+        bulkInput.focus();
+        
+        setTimeout(() => {
+            pasteBtn.innerHTML = originalContent;
+            pasteBtn.style.background = '';
+        }, 3000);
+    }
+}
+
+
         // Initialize on page load
         window.addEventListener('load', checkAccess);
+
+
+        
     </script>
 </body>
 </html>
