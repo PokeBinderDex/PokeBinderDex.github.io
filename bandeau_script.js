@@ -5,9 +5,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Wait for images to load
     function initBandeau() {
-        // Calculate total width of original 13 images
+        // Calculate total width of first set of images (before duplication)
+        const totalImages = images.length / 2; // Since images are duplicated
         let totalWidth = 0;
-        for (let i = 0; i < 13; i++) {
+        for (let i = 0; i < totalImages; i++) {
             totalWidth += images[i].offsetWidth + 20; // width + margin
         }
         
