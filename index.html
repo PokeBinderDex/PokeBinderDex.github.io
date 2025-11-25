@@ -31,10 +31,25 @@
     <script src="votes.js" defer></script>
 </head>
 <body>
-  
-    <!-- <div class="announcement-banner">
-        New PDF for your collection : <strong>see the cards enhancement frames!</strong>
-    </div> -->
+
+    <!-- Black Friday promo modal (auto-shown on load) -->
+    <div class="bf-modal-overlay" id="bfModal" aria-hidden="true">
+        <div class="bf-modal" role="dialog" aria-modal="true" aria-labelledby="bfTitle">
+                <div class="bf-progress" aria-hidden="true">
+                    <div class="bf-progress-bar" id="bfProgress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+                </div>
+            <button class="bf-close-btn" id="bfClose" aria-label="Close promo">✕</button>
+            <h3 id="bfTitle">Black Friday Sales ! 10% off !</h3>
+            <p class="bf-desc">Use code <strong id="bfCode">BLACKDEX10</strong> at checkout on PayHip to get 10% off.</p>
+            <div class="bf-actions">
+                <button class="bf-copy-btn" id="bfCopy">Copy code</button>
+            </div>
+        </div>
+    </div>
+
+        <!-- <div class="announcement-banner">
+        Black Friday Sale! Use code <span class="promo-code">BLACKDEX10</span> for 10% off all PAYHIP payments.
+        </div> -->
 
       
      <header>
@@ -756,5 +771,6 @@
             <p>Pokémon is a registered trademark. This is a fan-made product and is not affiliated with Nintendo or The Pokémon Company.</p>
         </div>
     </footer>
+        <script src="modal_script.js" defer></script>
 </body>
 </html>

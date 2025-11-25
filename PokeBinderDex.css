@@ -317,6 +317,115 @@ header p {
     padding: 20px;
 }
 
+
+    /* Black Friday promo modal (clean Apple-style) */
+    .bf-modal-overlay {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.36);
+        z-index: 99999;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 280ms ease, visibility 280ms ease;
+        -webkit-font-smoothing: antialiased;
+    }
+    .bf-modal-overlay.show {
+        opacity: 1;
+        visibility: visible;
+    }
+    .bf-modal {
+        background: #ffffff;
+        color: #111114;
+        width: min(520px, 92%);
+        padding: 24px 22px;
+        border-radius: 14px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.28);
+        border: 1px solid rgba(0,0,0,0.06);
+        text-align: center;
+        transform: translateY(-6px);
+        transition: transform 280ms ease;
+        position: relative;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+    .bf-modal-overlay.show .bf-modal { transform: translateY(0); }
+    .bf-close-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        border: none;
+        background: transparent;
+        font-size: 18px;
+        cursor: pointer;
+        color: #333;
+        padding: 6px;
+    }
+    .bf-modal h3 {
+        margin: 2px 0 6px;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+    .bf-desc { margin: 6px 0 12px; color: #444; font-size: 1rem; }
+    .bf-actions { display:flex; gap:12px; justify-content:center; align-items:center; margin-top:8px; }
+    .bf-copy-btn {
+        background: #0b0b0b;
+        color: #fff;
+        border: none;
+        padding: 10px 14px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 600;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    }
+    .bf-copy-btn:active { transform: translateY(1px); }
+    .bf-shop-link { background: transparent; color: #111; border: 1px solid rgba(0,0,0,0.08); padding: 10px 14px; border-radius: 10px; text-decoration: none; font-weight: 600; }
+
+    @media (max-width: 480px) {
+        .bf-modal { padding: 18px; border-radius: 12px; }
+        .bf-copy-btn, .bf-shop-link { padding: 9px 12px; }
+    }
+
+    /* Progress bar styled as a rounded rim (fills the modal's top rounded edge) */
+    .bf-progress {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 12px; /* space for the rounded track */
+        pointer-events: none;
+        border-top-left-radius: 14px;
+        border-top-right-radius: 14px;
+    }
+    .bf-progress::before{
+        /* track that follows the modal's rounded corners */
+        content: '';
+        position: absolute;
+        left: 8px;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 6px;
+        background: rgba(0,0,0,0.06);
+        border-radius: 999px;
+    }
+    .bf-progress-bar{
+        position: absolute;
+        left: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 6px;
+        width: 0%;
+        background: #000;
+        border-radius: 999px; /* rounded ends while filling */
+        will-change: width;
+    }
+
+    @media (max-width: 480px) {
+        .bf-progress{ height: 10px; border-top-left-radius: 12px; border-top-right-radius: 12px; }
+        .bf-progress::before, .bf-progress-bar{ left: 6px; right: 6px; height: 4px; }
+    }
 .step-by-step {
     background-color: white;
     padding: 30px;
