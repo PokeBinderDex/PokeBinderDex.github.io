@@ -73,6 +73,46 @@
         setTimeout(showModal, 450);
     });
 
+    // Countdown to Dec 1, 2025 23:30 (local time)
+    const countdownEl = document.getElementById('bfCountdown');
+    const daysEl = document.getElementById('bfDays');
+    const hoursEl = document.getElementById('bfHours');
+    const minutesEl = document.getElementById('bfMinutes');
+    const secondsEl = document.getElementById('bfSeconds');
+    let countdownInterval = null;
+
+    function updateCountdown(){
+        // elements must exist
+        if(!countdownEl || !daysEl || !hoursEl || !minutesEl) return;
+        const now = new Date();
+        const target = new Date(2025, 11, 1, 23, 30, 0); // Dec = 11 (0-based months)
+        let diff = target.getTime() - now.getTime();
+        if(diff <= 0){
+            daysEl.textContent = '0';
+            hoursEl.textContent = '00';
+            minutesEl.textContent = '00';
+            if(countdownInterval){ clearInterval(countdownInterval); countdownInterval = null; }
+            return;
+        }
+        const seconds = Math.floor(diff / 1000) % 60;
+        const minutes = Math.floor(diff / (1000 * 60)) % 60;
+        const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+        const pad = (n) => String(n).padStart(2,'0');
+        daysEl.textContent = String(days);
+        hoursEl.textContent = pad(hours);
+        minutesEl.textContent = pad(minutes);
+        if(secondsEl) secondsEl.textContent = pad(seconds);
+    }
+
+    // start countdown updates when DOM ready
+    document.addEventListener('DOMContentLoaded', ()=>{
+        updateCountdown();
+        if(countdownInterval) clearInterval(countdownInterval);
+        countdownInterval = setInterval(updateCountdown, 1000);
+    });
+
     if(closeBtn) closeBtn.addEventListener('click', hideModal);
     if(overlay) overlay.addEventListener('click', (e)=>{ if(e.target === overlay) hideModal(); });
     if(copyBtn) copyBtn.addEventListener('click', copyCode);
